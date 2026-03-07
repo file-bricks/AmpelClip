@@ -1,19 +1,17 @@
 # AmpelClip
 
-Datenschutz-Ampel fuer Zwischenablage-Ueberwachung. Erkennt sensible Daten (IBAN, E-Mail, Telefonnummern, Kreditkarten) in Echtzeit und anonymisiert Clipboard-Inhalte automatisch.
-
 Privacy traffic light for clipboard monitoring. Detects sensitive data (IBAN, email, phone numbers, credit cards) in real-time and anonymizes clipboard content automatically.
 
-## Funktionen / Features
+## Features
 
-- **Ampel-System / Traffic Light** -- Rot (blockiert) / Gelb (Vorschau) / Gruen (Auto-Anonymisierung)
-- **Eingebaute Regex-Patterns** -- IBAN, E-Mail, Telefon (DE), Kreditkarten, PLZ, Datum
-- **Eigene Wortlisten / Custom Word Lists** -- Sensibel-Liste und Whitelist mit Import/Export (TXT, Excel)
-- **System-Tray-Integration** -- Farbiges Icon zeigt aktuellen Status
-- **Clipboard-Verlauf / History** -- Letzte 15 Eintraege mit Wiederherstellen und anonymisiertem Kopieren
-- **Live-Vorschau / Preview** -- Original vs. anonymisierter Text nebeneinander
+- **Traffic Light System** -- Red (blocked) / Yellow (preview) / Green (auto-anonymization)
+- **Built-in Regex Patterns** -- IBAN, email, phone (DE), credit cards, zip codes, dates
+- **Custom Word Lists** -- Sensitive list and whitelist with import/export (TXT, Excel)
+- **System Tray Integration** -- Colored icon shows current status
+- **Clipboard History** -- Last 15 entries with restore and anonymized copy
+- **Live Preview** -- Original vs. anonymized text side by side
 
-## Voraussetzungen / Requirements
+## Requirements
 
 - Python 3.10+
 - Windows
@@ -24,47 +22,50 @@ Privacy traffic light for clipboard monitoring. Detects sensitive data (IBAN, em
 pip install -r requirements.txt
 ```
 
-## Verwendung / Usage
+## Usage
 
 ```bash
 python Ampel6.py
 ```
 
-Oder ueber `START.bat`.
+Or via `START.bat`.
 
-### EXE erstellen / Build executable
+### Build Executable
 
 ```bash
 pip install pyinstaller
 pyinstaller --onefile --noconsole --icon=ICO.ico --name=AmpelClip Ampel6.py
 ```
 
-## Konfiguration / Configuration
+## Configuration
 
-Einstellungen werden in `config.json` gespeichert (wird beim ersten Start automatisch erstellt).
 Settings are saved in `config.json` (auto-generated on first run).
 
-| Einstellung / Setting | Beschreibung / Description |
-|----------------------|---------------------------|
-| `builtin_patterns` | Regex-Patterns aktivieren/deaktivieren / Enable/disable pattern types |
-| `ampel_status` | Aktueller Ampel-Status / Current traffic light state |
-| `case_sensitive` | Gross-/Kleinschreibung beachten / Case-sensitive matching |
-| `whole_words` | Nur ganze Woerter / Whole-word matching only |
-| `files` | Importierte Listendateien / Previously imported list files |
+| Setting | Description |
+|---------|-------------|
+| `builtin_patterns` | Enable/disable pattern types |
+| `ampel_status` | Current traffic light state |
+| `case_sensitive` | Case-sensitive matching |
+| `whole_words` | Whole-word matching only |
+| `files` | Previously imported list files |
 
-## So funktioniert es / How it works
+## How It Works
 
-1. Ampel auf gewuenschten Modus setzen (Rot/Gelb/Gruen)
-2. Sensible Begriffe importieren oder eingebaute Patterns aktivieren
-3. AmpelClip ueberwacht die Zwischenablage in Echtzeit
-4. **Rot** -- Keine Aktion, nur Anzeige
-5. **Gelb** -- Vorschau, zeigt was anonymisiert wuerde
-6. **Gruen** -- Ersetzt sensible Daten automatisch durch `[ANONYM]`
+1. Set the traffic light to the desired mode (Red/Yellow/Green)
+2. Import sensitive terms or enable built-in patterns
+3. AmpelClip monitors the clipboard in real-time
+4. **Red** -- No action, display only
+5. **Yellow** -- Preview, shows what would be anonymized
+6. **Green** -- Automatically replaces sensitive data with `[ANONYM]`
 
-## Lizenz / License
+## License
 
-GPL-3.0 -- siehe [LICENSE](LICENSE)
+GPL-3.0 -- see [LICENSE](LICENSE)
 
-## Autor / Author
+## Author
 
 Lukas Geiger ([@lukisch](https://github.com/lukisch))
+
+---
+
+Deutsche Version: [README.de.md](README.de.md)

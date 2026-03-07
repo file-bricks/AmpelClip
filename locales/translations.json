@@ -1,0 +1,90 @@
+{
+  "Anonymisierungsvorschau (Gelb/Grün)": {
+    "de": "Anonymisierungsvorschau (Gelb/Grün)",
+    "en": "Anonymization Preview (Yellow/Green)"
+  },
+  "Dateien importieren": {
+    "de": "Dateien importieren",
+    "en": "Import Files"
+  },
+  "Groß-/Kleinschreibung beachten": {
+    "de": "Groß-/Kleinschreibung beachten",
+    "en": "Case Sensitive"
+  },
+  "Import Sensibel": {
+    "de": "Import Sensibel",
+    "en": "Import Sensitive"
+  },
+  "Import Whitelist": {
+    "de": "Import Whitelist",
+    "en": "Import Whitelist"
+  },
+  "Letzte Kopiervorgänge": {
+    "de": "Letzte Kopiervorgänge",
+    "en": "Recent Copy Operations"
+  },
+  "Löschen": {
+    "de": "Löschen",
+    "en": "Delete"
+  },
+  "Nur ganze Wörter": {
+    "de": "Nur ganze Wörter",
+    "en": "Whole Words Only"
+  },
+  "❌ Ausgewählte löschen": {
+    "de": "❌ Ausgewählte löschen",
+    "en": "❌ Delete Selected"
+  },
+  "❌ Ausgewählte löschen (Sensible)": {
+    "de": "❌ Ausgewählte löschen (Sensible)",
+    "en": "❌ Delete Selected (Sensitive)"
+  },
+  "❌ Ausgewählte löschen (Whitelist)": {
+    "de": "❌ Ausgewählte löschen (Whitelist)",
+    "en": "❌ Delete Selected (Whitelist)"
+  },
+  "💾 Export Sensible": {
+    "de": "💾 Export Sensible",
+    "en": "💾 Export Sensitive"
+  },
+  "💾 Export Whitelist": {
+    "de": "💾 Export Whitelist",
+    "en": "💾 Export Whitelist"
+  },
+  "📁 Dateien laden": {
+    "de": "📁 Dateien laden",
+    "en": "📁 Load Files"
+  },
+  "📋 Geladene Listen": {
+    "de": "📋 Geladene Listen",
+    "en": "📋 Loaded Lists"
+  },
+  "🔎 Filter:": {
+    "de": "🔎 Filter:",
+    "en": "🔎 Filter:"
+  },
+  "🔴 Import Sensibel": {
+    "de": "🔴 Import Sensibel",
+    "en": "🔴 Import Sensitive"
+  },
+  "🔴 Rot: Keine Änderung.": {
+    "de": "🔴 Rot: Keine Änderung.",
+    "en": "🔴 Red: No Change."
+  },
+  "🔴 Sensible Daten laden": {
+    "de": "🔴 Sensible Daten laden",
+    "en": "🔴 Load Sensitive Data"
+  },
+  "🕘 Verlauf der letzten Kopiervorgänge": {
+    "de": "🕘 Verlauf der letzten Kopiervorgänge",
+    "en": "🕘 History of Recent Copy Operations"
+  },
+  "🟢 Import Whitelist": {
+    "de": "🟢 Import Whitelist",
+    "en": "🟢 Import Whitelist"
+  },
+  "🟢 Whitelist laden": {
+    "de": "🟢 Whitelist laden",
+    "en": "🟢 Load Whitelist"
+  }
+}

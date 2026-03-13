@@ -433,7 +433,7 @@ class AmpelTool(QMainWindow):
                 self.whole_words = cfg.get("whole_words", False)
                 
                 # NEU: Builtin Patterns laden
-                self.builtin_enabled = cfg.get("builtin_patterns", self.builtin_enabled)
+                self.builtin_enabled = {**self.builtin_enabled, **cfg.get("builtin_patterns", {})}
                 
                 self.cb_case.setChecked(self.case_sensitive)
                 self.cb_words.setChecked(self.whole_words)
@@ -483,7 +483,11 @@ class AmpelTool(QMainWindow):
         try:
             target = self.sensitive if typ == "sensibel" else self.whitelist
             if path.suffix == ".xlsx":
-                content = pd.read_excel(path, header=None).squeeze().astype(str).tolist()
+                df = pd.read_excel(path, header=None)
+                if df.empty:
+                    content = []
+                else:
+                    content = df.iloc[:, 0].astype(str).tolist()
             else:
                 content = path.read_text(encoding="utf-8").splitlines()
             for item in content:
@@ -516,10 +520,10 @@ class AmpelTool(QMainWindow):
                 continue
             esc = re.escape(item)
             pat = rf"(?<!\w){esc}(?!\w)" if self.whole_words else esc
-            try: 
+            try:
                 self.patterns.append(re.compile(pat, flags))
-            except: 
-                pass
+            except re.error as e:
+                logging.warning(f"Ungültiges Regex-Pattern für '{item}': {e}")
         
         # 2. NEU: Eingebaute Regex-Patterns
         for key, enabled in self.builtin_enabled.items():

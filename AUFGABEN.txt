@@ -1,0 +1,21 @@
+AUFGABEN - AmpelClip
+====================
+Stand: 13.03.2026
+
+## BUGFIXES (Session 2026-03-13, Claude Opus)
+
+[x] MITTEL: squeeze() auf DataFrame ohne Spaltenauswahl (Ampel6.py)
+    - Fix: df.empty-Pruefung + df.iloc[:, 0].astype(str).tolist()
+[x] MITTEL: Config-Verschmutzung bei Pattern-Keys (Ampel6.py ~Zeile 436)
+    - Fix: Merge-Logik -- neue Code-Keys bleiben erhalten, Config ueberschreibt nur bekannte
+[x] NIEDRIG: Bare except:pass bei re.compile (Ampel6.py ~Zeile 522)
+    - Fix: except re.error as e mit logging.warning()
+
+## OFFENE BUGS
+
+(keine bekannten)
+
+## GITHUB-POLICY Compliance (Stand: 05.03.2026)
+Referenz: .SOFTWARE/GITHUB-POLICY.md
+
+[x] README.md zweisprachig -- DONE 2026-03-08

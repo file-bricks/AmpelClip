@@ -11,14 +11,14 @@ from pathlib import Path
 from typing import List, Tuple, Dict
 
 import pandas as pd
-from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-    QTabWidget, QPushButton, QLabel, QLineEdit, QListWidget, 
-    QTextEdit, QFileDialog, QMessageBox, QFrame, QCheckBox, 
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QTabWidget, QPushButton, QLabel, QLineEdit, QListWidget,
+    QTextEdit, QFileDialog, QMessageBox, QFrame, QCheckBox,
     QSplitter, QSystemTrayIcon, QMenu, QGroupBox
 )
-from PyQt6.QtCore import Qt, QSize, QEvent
-from PyQt6.QtGui import QAction, QIcon, QColor, QPixmap, QPainter, QBrush
+from PySide6.QtCore import Qt, QSize, QEvent
+from PySide6.QtGui import QAction, QIcon, QColor, QPixmap, QPainter, QBrush
 
 # --- Konfiguration ---
 CONFIG_PATH = Path(__file__).parent / "config.json"

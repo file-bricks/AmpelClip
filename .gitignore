@@ -36,5 +36,9 @@ Desktop.ini
 # BACH Interne Steuerungsdateien
 AUFGABEN.txt
 
+# User-State (wird beim ersten Start aus In-Code-Defaults neu erzeugt;
+# Template liegt in config.example.json)
+config.json
+
 # Logs
 *.log

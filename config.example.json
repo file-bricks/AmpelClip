@@ -1,0 +1,15 @@
+{
+  "_comment": "Template fuer AmpelClip config.json. Wird NICHT direkt gelesen -- die App erzeugt beim ersten Start automatisch eine frische config.json mit In-Code-Defaults (siehe BUILTIN_PATTERNS in Ampel6.py). Diese Datei dient nur als Referenz fuer die Struktur und die empfohlenen Release-Defaults.",
+  "files": [],
+  "ampel_status": "rot",
+  "case_sensitive": false,
+  "whole_words": false,
+  "builtin_patterns": {
+    "iban": true,
+    "email": true,
+    "phone_de": false,
+    "creditcard": false,
+    "postcode_de": false,
+    "date_de": false
+  }
+}

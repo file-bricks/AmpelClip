@@ -1,6 +1,6 @@
 """
 AmpelTool V6 - Datenschutz & Clipboard Monitor
-Neu: Eingebaute Regex-Patterns fuer IBAN, Email, Telefon, Kreditkarten
+Neu: Eingebaute Regex-Patterns für IBAN, Email, Telefon, Kreditkarten
 """
 
 import sys
@@ -143,7 +143,7 @@ class AmpelTool(QMainWindow):
         main_layout.addWidget(self.tabs)
 
         self.tab_data = QWidget()
-        self.tab_patterns = QWidget()  # NEU: Tab fuer Patterns
+        self.tab_patterns = QWidget()  # NEU: Tab für Patterns
         self.tab_ampel = QWidget()
         self.tab_history = QWidget()
 
@@ -249,12 +249,12 @@ class AmpelTool(QMainWindow):
         
         self.entry_sens = QLineEdit(placeholderText="Neuer sensibler Begriff...")
         self.entry_sens.returnPressed.connect(lambda: self._add_manual(self.entry_sens, self.sensitive))
-        btn_add_sens = QPushButton("Hinzufuegen", objectName="Danger")
+        btn_add_sens = QPushButton("Hinzufügen", objectName="Danger")
         btn_add_sens.clicked.connect(lambda: self._add_manual(self.entry_sens, self.sensitive))
 
         self.entry_white = QLineEdit(placeholderText="Neuer Whitelist Begriff...")
         self.entry_white.returnPressed.connect(lambda: self._add_manual(self.entry_white, self.whitelist))
-        btn_add_white = QPushButton("Hinzufuegen", objectName="Success")
+        btn_add_white = QPushButton("Hinzufügen", objectName="Success")
         btn_add_white.clicked.connect(lambda: self._add_manual(self.entry_white, self.whitelist))
 
         manual_layout.addWidget(self.entry_sens)
@@ -278,7 +278,7 @@ class AmpelTool(QMainWindow):
         self.list_sens = QListWidget()
         self.list_sens.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
         l_sens.addWidget(self.list_sens)
-        btn_del_sens = QPushButton("Ausgewaehlte loeschen")
+        btn_del_sens = QPushButton("Ausgewählte löschen")
         btn_del_sens.clicked.connect(lambda: self._delete_selected(self.list_sens, self.sensitive))
         l_sens.addWidget(btn_del_sens)
         
@@ -292,7 +292,7 @@ class AmpelTool(QMainWindow):
         self.list_white = QListWidget()
         self.list_white.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
         l_white.addWidget(self.list_white)
-        btn_del_white = QPushButton("Ausgewaehlte loeschen")
+        btn_del_white = QPushButton("Ausgewählte löschen")
         btn_del_white.clicked.connect(lambda: self._delete_selected(self.list_white, self.whitelist))
         l_white.addWidget(btn_del_white)
 
@@ -307,8 +307,8 @@ class AmpelTool(QMainWindow):
         layout.addWidget(QLabel("Eingebaute Datenschutz-Patterns", objectName="Header"))
         layout.addWidget(QLabel("Aktiviere Pattern-Typen um automatisch sensible Daten zu erkennen:"))
         
-        # GroupBox fuer Patterns
-        group = QGroupBox("Verfuegbare Patterns")
+        # GroupBox für Patterns
+        group = QGroupBox("Verfügbare Patterns")
         group_layout = QVBoxLayout(group)
         
         self.pattern_checkboxes: Dict[str, QCheckBox] = {}
@@ -558,7 +558,7 @@ class AmpelTool(QMainWindow):
 
     def _delete_selected(self, lst, target):
         items = lst.selectedItems()
-        if items and QMessageBox.question(self, "Loeschen", f"{len(items)} loeschen?") == QMessageBox.StandardButton.Yes:
+        if items and QMessageBox.question(self, "Löschen", f"{len(items)} löschen?") == QMessageBox.StandardButton.Yes:
             for i in items:
                 if i.text() in target: 
                     target.remove(i.text())
@@ -627,7 +627,7 @@ class AmpelTool(QMainWindow):
 
         # Ampel-Status verarbeiten
         if self.ampel_status == "rot":
-            self.lbl_status_detail.setText("ROT: Keine Aenderung am Clipboard.")
+            self.lbl_status_detail.setText("ROT: Keine änderung am Clipboard.")
         elif self.ampel_status == "gelb":
             if text != anon:
                 self.lbl_status_detail.setText("GELB: Vorschau - " + str(len(self.patterns)) + " Patterns aktiv.")

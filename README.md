@@ -30,6 +30,10 @@ python Ampel6.py
 
 Oder ueber `START.bat`.
 
+## Screenshot
+
+![AmpelClip Hauptfenster](README/screenshots/main.png)
+
 ### EXE erstellen
 
 ```bash
@@ -95,6 +99,10 @@ python Ampel6.py
 ```
 
 Or via `START.bat`.
+
+### Screenshot
+
+![AmpelClip Main Window](README/screenshots/main.png)
 
 #### Build Executable
 

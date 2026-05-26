@@ -10,6 +10,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - `llms.txt` als maschinenlesbarer Projektkontext ergänzt.
 - Community-Workflows auf aktuelle Action-Versionen aktualisiert.
 
+### Hinzugefügt / Added
+- Portierungsplan für Windows Store, Web/PWA-Companion, Android/iOS-PWA-Smokes sowie macOS/Linux-Source-Smokes ergänzt.
+- Austauschformat `ampelclip-profile-v1.json` für spätere plattformübergreifende Profilübergabe skizziert.
+- Planungsordner `web_companion/` für eine spätere PWA-Linie angelegt.
+
 ## [6.2.0] - 2026-01-03
 
 ### Hinzugefügt / Added

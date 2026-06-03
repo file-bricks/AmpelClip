@@ -1,157 +1,114 @@
 # AmpelClip
 
-Datenschutz-Ampel fuer Zwischenablage-Ueberwachung. Erkennt sensible Daten (IBAN, E-Mail, Telefonnummern, Kreditkarten) in Echtzeit und anonymisiert Clipboard-Inhalte automatisch.
+AmpelClip is a local-first Windows clipboard privacy monitor. It watches clipboard text, detects sensitive patterns such as IBANs, email addresses, German phone numbers and credit-card-like numbers, and helps anonymize copied content before it is pasted elsewhere.
 
-## Funktionen
+![AmpelClip main window](README/screenshots/main.png)
 
-- **Ampel-System** -- Rot (blockiert) / Gelb (Vorschau) / Gruen (Auto-Anonymisierung)
-- **Eingebaute Regex-Patterns** -- IBAN, E-Mail, Telefon (DE), Kreditkarten, PLZ, Datum
-- **Eigene Wortlisten** -- Sensibel-Liste und Whitelist mit Import/Export (TXT, Excel)
-- **System-Tray-Integration** -- Farbiges Icon zeigt aktuellen Status
-- **Clipboard-Verlauf** -- Letzte 15 Eintraege mit Wiederherstellen und anonymisiertem Kopieren
-- **Live-Vorschau** -- Original vs. anonymisierter Text nebeneinander
+## Start Here
 
-## Voraussetzungen
+| Need | Use |
+|---|---|
+| Run the desktop tool | `python Ampel6.py` or `START.bat` |
+| Configure detection | Enable built-in regex patterns and import sensitive/whitelist terms |
+| Review before replacing | Use yellow preview mode |
+| Auto-anonymize clipboard text | Use green mode after checking the rules |
+| Understand limits | Read the manual-review warning below |
 
-- Python 3.10+
-- Windows
+## Why AmpelClip
 
-## Installation
+- **Traffic-light workflow**: red for monitor-only, yellow for preview, green for automatic replacement.
+- **Clipboard-focused privacy support**: useful before pasting text into documents, tickets, chat tools, LLM prompts or web forms.
+- **Built-in pattern detection**: IBAN, email, German phone numbers, credit-card-like numbers, postal codes and dates.
+- **Custom lists**: import sensitive terms and whitelist terms from TXT or Excel files.
+- **Local-first desktop app**: clipboard handling stays on the local Windows machine.
+- **Tray integration and history**: colored tray icon plus the last 15 clipboard entries.
 
-```bash
-pip install -r requirements.txt
-```
+AmpelClip is not a DLP platform and does not guarantee complete redaction. It is a helper for privacy workflows, not a substitute for manual review.
 
-## Verwendung
+## Install
 
-```bash
-python Ampel6.py
-```
-
-Oder ueber `START.bat`.
-
-## Screenshot
-
-![AmpelClip Hauptfenster](README/screenshots/main.png)
-
-### EXE erstellen
-
-```bash
-pip install pyinstaller
-pyinstaller --onefile --noconsole --icon=ICO.ico --name=AmpelClip Ampel6.py
-```
-
-## Konfiguration
-
-Einstellungen werden in `config.json` gespeichert (wird beim ersten Start automatisch erstellt).
-
-| Einstellung | Beschreibung |
-|-------------|-------------|
-| `builtin_patterns` | Regex-Patterns aktivieren/deaktivieren |
-| `ampel_status` | Aktueller Ampel-Status |
-| `case_sensitive` | Gross-/Kleinschreibung beachten |
-| `whole_words` | Nur ganze Woerter |
-| `files` | Importierte Listendateien |
-
-## So funktioniert es
-
-1. Ampel auf gewuenschten Modus setzen (Rot/Gelb/Gruen)
-2. Sensible Begriffe importieren oder eingebaute Patterns aktivieren
-3. AmpelClip ueberwacht die Zwischenablage in Echtzeit
-4. **Rot** -- Keine Aktion, nur Anzeige
-5. **Gelb** -- Vorschau, zeigt was anonymisiert wuerde
-6. **Gruen** -- Ersetzt sensible Daten automatisch durch `[ANONYM]`
-
-## Autor
-
-Lukas Geiger ([@lukisch](https://github.com/lukisch))
-
----
-
-## English
-
-Privacy traffic light for clipboard monitoring. Detects sensitive data (IBAN, email, phone numbers, credit cards) in real-time and anonymizes clipboard content automatically.
-
-### Features
-
-- **Traffic Light System** -- Red (blocked) / Yellow (preview) / Green (auto-anonymization)
-- **Built-in Regex Patterns** -- IBAN, email, phone (DE), credit cards, postal codes, dates
-- **Custom Word Lists** -- Sensitive list and whitelist with import/export (TXT, Excel)
-- **System Tray Integration** -- Colored icon shows current status
-- **Clipboard History** -- Last 15 entries with restore and anonymized copy
-- **Live Preview** -- Original vs. anonymized text side by side
-
-### Requirements
+Requirements:
 
 - Python 3.10+
 - Windows
 
-### Installation
-
 ```bash
+git clone https://github.com/file-bricks/AmpelClip.git
+cd AmpelClip
 pip install -r requirements.txt
-```
-
-### Usage
-
-```bash
 python Ampel6.py
 ```
 
-Or via `START.bat`.
+You can also start the app with `START.bat`.
 
-### Screenshot
+## How It Works
 
-![AmpelClip Main Window](README/screenshots/main.png)
+1. Choose red, yellow or green mode.
+2. Enable built-in patterns and optionally import sensitive terms or whitelists.
+3. Copy text as usual.
+4. AmpelClip checks the clipboard content locally.
+5. In yellow mode, review the original and anonymized preview.
+6. In green mode, matching sensitive content is replaced with `[ANONYM]`.
 
-#### Build Executable
+## Configuration
 
-```bash
-pip install pyinstaller
-pyinstaller --onefile --noconsole --icon=ICO.ico --name=AmpelClip Ampel6.py
-```
-
-### Configuration
-
-Settings are saved in `config.json` (auto-generated on first run).
+Settings are saved in `config.json`, which is created on first start.
 
 | Setting | Description |
-|---------|-------------|
-| `builtin_patterns` | Enable/disable pattern types |
-| `ampel_status` | Current traffic light state |
+|---|---|
+| `builtin_patterns` | Enabled and disabled built-in pattern types |
+| `ampel_status` | Current traffic-light mode |
 | `case_sensitive` | Case-sensitive matching |
 | `whole_words` | Whole-word matching only |
 | `files` | Previously imported list files |
 
-### How It Works
+## Build Executable
 
-1. Set the traffic light to the desired mode (Red/Yellow/Green)
-2. Import sensitive terms or enable built-in patterns
-3. AmpelClip monitors the clipboard in real-time
-4. **Red** -- No action, display only
-5. **Yellow** -- Preview, shows what would be anonymized
-6. **Green** -- Automatically replaces sensitive data with `[ANONYM]`
+```bash
+pip install pyinstaller
+pyinstaller --onefile --noconsole --icon=ICO.ico --name=AmpelClip Ampel6.py
+```
 
-### Author
+## Search Context
 
-Lukas Geiger ([@lukisch](https://github.com/lukisch))
+AmpelClip is part of the `file-bricks` local-first desktop tools family. Useful search phrases:
+
+- `AmpelClip clipboard privacy monitor`
+- `file-bricks AmpelClip`
+- `local clipboard anonymization PySide6`
+- `Windows clipboard redaction helper`
+- `privacy traffic light clipboard tool`
+
+## Deutsch
+
+AmpelClip ist ein lokales Windows-Tool zur Datenschutz-Unterstützung in der Zwischenablage. Es erkennt sensible Daten wie IBANs, E-Mail-Adressen, deutsche Telefonnummern und kreditkartenähnliche Zahlen in kopiertem Text und hilft, diese Inhalte vor dem Einfügen zu anonymisieren.
+
+### Funktionen
+
+- **Ampel-System**: Rot für reines Beobachten, Gelb für Vorschau, Grün für automatische Anonymisierung.
+- **Eingebaute Regex-Patterns**: IBAN, E-Mail, Telefon (DE), Kreditkarten, PLZ und Datum.
+- **Eigene Wortlisten**: Sensibel-Liste und Whitelist mit Import/Export für TXT und Excel.
+- **System-Tray-Integration**: Farbiges Icon zeigt den aktuellen Status.
+- **Clipboard-Verlauf**: Letzte 15 Einträge mit Wiederherstellen und anonymisiertem Kopieren.
+- **Live-Vorschau**: Original und anonymisierter Text nebeneinander.
+
+### Nutzung
+
+```bash
+git clone https://github.com/file-bricks/AmpelClip.git
+cd AmpelClip
+pip install -r requirements.txt
+python Ampel6.py
+```
+
+Oder über `START.bat`.
+
+### Wichtige Grenze
+
+AmpelClip garantiert keine vollständige Schwärzung oder Anonymisierung. Das Werkzeug unterstützt Datenschutz-Prozesse, kann sie aber nicht vollständig automatisieren. Manuelle Nachkontrolle ist Pflicht.
 
 ## License
 
-GPL-3.0 -- see [LICENSE](LICENSE)
+MIT, see [LICENSE](LICENSE).
 
-> **Keine Garantie vollständiger Schwärzung/Anonymisierung.** Dieses Werkzeug unterstützt Privacy-Prozesse, kann sie aber nicht vollständig automatisieren. Manuelle Nachkontrolle ist Pflicht.
->
-> **No guarantee of complete redaction/anonymization.** This tool supports privacy processes but cannot fully automate them. Manual review is required.
-
-
----
-
-## Haftung / Liability
-
-Dieses Projekt ist eine **unentgeltliche Open-Source-Schenkung** im Sinne der §§ 516 ff. BGB. Die Haftung des Urhebers ist gemäß **§ 521 BGB** auf **Vorsatz und grobe Fahrlässigkeit** beschränkt. Ergänzend gelten die Haftungsausschlüsse aus GPL-3.0 / MIT / Apache-2.0 §§ 15–16 (je nach gewählter Lizenz).
-
-Nutzung auf eigenes Risiko. Keine Wartungszusage, keine Verfügbarkeitsgarantie, keine Gewähr für Fehlerfreiheit oder Eignung für einen bestimmten Zweck.
-
-This project is an unpaid open-source donation. Liability is limited to intent and gross negligence (§ 521 German Civil Code). Use at your own risk. No warranty, no maintenance guarantee, no fitness-for-purpose assumed.
-
+This project is an unpaid open-source donation. Liability is limited to intent and gross negligence (§ 521 German Civil Code). Use at your own risk. No warranty, maintenance guarantee or fitness-for-purpose is assumed.

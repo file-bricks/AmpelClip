@@ -7,8 +7,9 @@ import sys
 import json
 import re
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Any, List, Tuple, Dict
 
 import pandas as pd
 from PySide6.QtWidgets import (
@@ -23,6 +24,15 @@ from PySide6.QtGui import QAction, QIcon, QColor, QPixmap, QPainter, QBrush
 # --- Konfiguration ---
 CONFIG_PATH = Path(__file__).parent / "config.json"
 HISTORY_LIMIT = 15
+APP_NAME = "AmpelClip"
+APP_VERSION = "6"
+PROFILE_SCHEMA_VERSION = "ampelclip-profile-v1"
+PROFILE_DEFAULT_FILENAME = f"{PROFILE_SCHEMA_VERSION}.json"
+VALID_AMPEL_STATUSES = {"rot", "gelb", "gruen"}
+PATTERN_KEY_ALIASES = {
+    "credit_card": "creditcard",
+    "postal_code_de": "postcode_de",
+}
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 
@@ -65,6 +75,120 @@ BUILTIN_PATTERNS = {
         "default": False
     }
 }
+
+
+def _clean_unique_strings(values: Any) -> List[str]:
+    if not isinstance(values, list):
+        return []
+    result: List[str] = []
+    seen = set()
+    for value in values:
+        text = str(value).strip()
+        if text and text not in seen:
+            seen.add(text)
+            result.append(text)
+    return result
+
+
+def _normalized_ampel_status(value: Any) -> str:
+    status = str(value or "").strip().lower()
+    return status if status in VALID_AMPEL_STATUSES else "rot"
+
+
+def _normalized_builtin_patterns(
+    values: Any,
+    defaults: Dict[str, bool] | None = None,
+) -> Dict[str, bool]:
+    state = {
+        key: bool((defaults or {}).get(key, info["default"]))
+        for key, info in BUILTIN_PATTERNS.items()
+    }
+    if not isinstance(values, dict):
+        return state
+    for raw_key, enabled in values.items():
+        key = PATTERN_KEY_ALIASES.get(str(raw_key), str(raw_key))
+        if key in state:
+            state[key] = bool(enabled)
+    return state
+
+
+def build_profile_export_payload(
+    sensitive: List[str],
+    whitelist: List[str],
+    builtin_enabled: Dict[str, bool],
+    ampel_status: str,
+    case_sensitive: bool,
+    whole_words: bool,
+    exported_at: datetime | str | None = None,
+) -> Dict[str, Any]:
+    if exported_at is None:
+        exported_at_value = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    elif isinstance(exported_at, datetime):
+        exported_at_value = exported_at.replace(microsecond=0).isoformat()
+    else:
+        exported_at_value = str(exported_at)
+
+    return {
+        "schema_version": PROFILE_SCHEMA_VERSION,
+        "app": {
+            "name": APP_NAME,
+            "version": APP_VERSION,
+            "exported_at": exported_at_value,
+        },
+        "settings": {
+            "ampel_status": _normalized_ampel_status(ampel_status),
+            "case_sensitive": bool(case_sensitive),
+            "whole_words": bool(whole_words),
+        },
+        "builtin_patterns": _normalized_builtin_patterns(
+            builtin_enabled,
+            defaults={key: False for key in BUILTIN_PATTERNS},
+        ),
+        "lists": {
+            "sensibel": _clean_unique_strings(sensitive),
+            "whitelist": _clean_unique_strings(whitelist),
+        },
+    }
+
+
+def normalize_profile_payload(payload: Any) -> Dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise ValueError("Profil muss ein JSON-Objekt sein.")
+    if payload.get("schema_version") != PROFILE_SCHEMA_VERSION:
+        raise ValueError(f"Nicht unterstütztes Profilformat: {payload.get('schema_version')!r}")
+
+    settings = payload.get("settings", {})
+    if not isinstance(settings, dict):
+        settings = {}
+    lists = payload.get("lists", {})
+    if not isinstance(lists, dict):
+        lists = {}
+
+    return {
+        "schema_version": PROFILE_SCHEMA_VERSION,
+        "app": payload.get("app", {}) if isinstance(payload.get("app", {}), dict) else {},
+        "settings": {
+            "ampel_status": _normalized_ampel_status(settings.get("ampel_status")),
+            "case_sensitive": bool(settings.get("case_sensitive", False)),
+            "whole_words": bool(settings.get("whole_words", False)),
+        },
+        "builtin_patterns": _normalized_builtin_patterns(payload.get("builtin_patterns", {})),
+        "lists": {
+            "sensibel": _clean_unique_strings(lists.get("sensibel", [])),
+            "whitelist": _clean_unique_strings(lists.get("whitelist", [])),
+        },
+    }
+
+
+def write_profile_payload(path: Path, payload: Dict[str, Any]) -> None:
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def read_profile_payload(path: Path) -> Dict[str, Any]:
+    return normalize_profile_payload(json.loads(path.read_text(encoding="utf-8")))
 
 # --- Stylesheet (Modernes Design) ---
 STYLESHEET = """
@@ -217,7 +341,7 @@ class AmpelTool(QMainWindow):
             self.hide()
             self.tray_icon.showMessage(
                 "AmpelTool minimiert",
-                "Laeuft im Hintergrund weiter.",
+                "Läuft im Hintergrund weiter.",
                 QSystemTrayIcon.MessageIcon.Information, 2000
             )
 
@@ -240,6 +364,8 @@ class AmpelTool(QMainWindow):
         files_layout.addWidget(btn_load_white)
         files_layout.addWidget(QPushButton("Export Sensibel", clicked=lambda: self._export_list("sensibel")))
         files_layout.addWidget(QPushButton("Export Whitelist", clicked=lambda: self._export_list("whitelist")))
+        files_layout.addWidget(QPushButton("Profil exportieren", clicked=self._export_profile))
+        files_layout.addWidget(QPushButton("Profil importieren", clicked=self._import_profile))
         
         layout.addWidget(QLabel("Dateioperationen", objectName="Header"))
         layout.addWidget(frame_files)
@@ -285,7 +411,7 @@ class AmpelTool(QMainWindow):
         w_white = QWidget()
         l_white = QVBoxLayout(w_white)
         l_white.setContentsMargins(0,0,0,0)
-        l_white.addWidget(QLabel("Whitelist (Gruen)"))
+        l_white.addWidget(QLabel("Whitelist (Grün)"))
         self.filter_white = QLineEdit(placeholderText="Filter...")
         self.filter_white.textChanged.connect(self._update_listboxes)
         l_white.addWidget(self.filter_white)
@@ -329,8 +455,8 @@ class AmpelTool(QMainWindow):
         info_layout = QVBoxLayout(info_frame)
         info_layout.addWidget(QLabel("<b>Hinweis:</b>"))
         info_layout.addWidget(QLabel("Diese Patterns erkennen typische Formate automatisch."))
-        info_layout.addWidget(QLabel("Sie ergaenzen die manuellen Listen im Tab 'Listenverwaltung'."))
-        info_layout.addWidget(QLabel("IBAN und Email sind standardmaessig aktiviert."))
+        info_layout.addWidget(QLabel("Sie ergänzen die manuellen Listen im Tab 'Listenverwaltung'."))
+        info_layout.addWidget(QLabel("IBAN und E-Mail sind standardmäßig aktiviert."))
         layout.addWidget(info_frame)
         
         # Statistik
@@ -376,7 +502,7 @@ class AmpelTool(QMainWindow):
         btn_rot.clicked.connect(lambda: self._set_ampel("rot"))
         btn_gelb = QPushButton("PREVIEW (Gelb)", objectName="Warning", minimumHeight=40)
         btn_gelb.clicked.connect(lambda: self._set_ampel("gelb"))
-        btn_gruen = QPushButton("ACTIVE (Gruen)", objectName="Success", minimumHeight=40)
+        btn_gruen = QPushButton("ACTIVE (Grün)", objectName="Success", minimumHeight=40)
         btn_gruen.clicked.connect(lambda: self._set_ampel("gruen"))
         ctrl_container.addWidget(btn_rot)
         ctrl_container.addWidget(btn_gelb)
@@ -386,7 +512,7 @@ class AmpelTool(QMainWindow):
         opt_container = QHBoxLayout()
         self.cb_case = QCheckBox("Gross-/Kleinschreibung beachten")
         self.cb_case.stateChanged.connect(self._on_option_change)
-        self.cb_words = QCheckBox("Nur ganze Woerter")
+        self.cb_words = QCheckBox("Nur ganze Wörter")
         self.cb_words.stateChanged.connect(self._on_option_change)
         opt_container.addWidget(self.cb_case)
         opt_container.addWidget(self.cb_words)
@@ -469,6 +595,67 @@ class AmpelTool(QMainWindow):
         except Exception as e:
             logging.error(f"Config Save Error: {e}")
 
+    # ---------------- PROFIL-AUSTAUSCH ----------------
+    def _build_profile_payload(self):
+        return build_profile_export_payload(
+            sensitive=self.sensitive,
+            whitelist=self.whitelist,
+            builtin_enabled=self.builtin_enabled,
+            ampel_status=self.ampel_status,
+            case_sensitive=self.case_sensitive,
+            whole_words=self.whole_words,
+        )
+
+    def _apply_profile_payload(self, payload):
+        profile = normalize_profile_payload(payload)
+        self.sensitive = profile["lists"]["sensibel"]
+        self.whitelist = profile["lists"]["whitelist"]
+        self.ampel_status = profile["settings"]["ampel_status"]
+        self.case_sensitive = profile["settings"]["case_sensitive"]
+        self.whole_words = profile["settings"]["whole_words"]
+        self.builtin_enabled = profile["builtin_patterns"]
+
+        self.cb_case.setChecked(self.case_sensitive)
+        self.cb_words.setChecked(self.whole_words)
+        for key, cb in self.pattern_checkboxes.items():
+            cb.setChecked(self.builtin_enabled.get(key, False))
+
+        self._compile_patterns()
+        self._update_listboxes()
+        self._update_pattern_stats()
+        self._set_ampel(self.ampel_status)
+        self._save_config()
+
+    def _export_profile(self):
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Profil exportieren",
+            PROFILE_DEFAULT_FILENAME,
+            "JSON (*.json)",
+        )
+        if not path:
+            return
+        try:
+            write_profile_payload(Path(path), self._build_profile_payload())
+            QMessageBox.information(self, "Profil exportiert", "Profil wurde ohne Verlauf und Rohtexte exportiert.")
+        except Exception as e:
+            QMessageBox.critical(self, "Export fehlgeschlagen", str(e))
+
+    def _import_profile(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Profil importieren",
+            "",
+            "JSON (*.json)",
+        )
+        if not path:
+            return
+        try:
+            self._apply_profile_payload(read_profile_payload(Path(path)))
+            QMessageBox.information(self, "Profil importiert", "Profil wurde übernommen.")
+        except Exception as e:
+            QMessageBox.critical(self, "Import fehlgeschlagen", str(e))
+
     # ---------------- DATEI LOGIK ----------------
     def _load_files(self, typ):
         paths, _ = QFileDialog.getOpenFileNames(self, "Dateien laden", "", "Excel/Text (*.xlsx *.txt)")
@@ -487,7 +674,7 @@ class AmpelTool(QMainWindow):
                 if df.empty:
                     content = []
                 else:
-                    content = df.iloc[:, 0].astype(str).tolist()
+                    content = df.iloc[:, 0].dropna().astype(str).tolist()
             else:
                 content = path.read_text(encoding="utf-8").splitlines()
             for item in content:
@@ -569,7 +756,7 @@ class AmpelTool(QMainWindow):
     # ---------------- AMPEL LOGIK ----------------
     def _set_ampel(self, status):
         self.ampel_status = status
-        colors = {"rot": ("#dc3545", "ROT"), "gelb": ("#ffc107", "GELB (Vorschau)"), "gruen": ("#28a745", "GRUEN (Aktiv)")}
+        colors = {"rot": ("#dc3545", "ROT"), "gelb": ("#ffc107", "GELB (Vorschau)"), "gruen": ("#28a745", "GRÜN (Aktiv)")}
         c, t = colors.get(status, ("#6c757d", "AUS"))
         
         self.lbl_ampel_icon.setStyleSheet(f"border-radius: 50px; background-color: {c}; border: 4px solid rgba(0,0,0,0.1);")
@@ -627,7 +814,7 @@ class AmpelTool(QMainWindow):
 
         # Ampel-Status verarbeiten
         if self.ampel_status == "rot":
-            self.lbl_status_detail.setText("ROT: Keine änderung am Clipboard.")
+            self.lbl_status_detail.setText("ROT: Keine Änderung am Clipboard.")
         elif self.ampel_status == "gelb":
             if text != anon:
                 self.lbl_status_detail.setText("GELB: Vorschau - " + str(len(self.patterns)) + " Patterns aktiv.")
@@ -638,11 +825,11 @@ class AmpelTool(QMainWindow):
                 self.clipboard_lock = True
                 self.clipboard.setText(anon)
                 self.clipboard_lock = False
-                self.lbl_status_detail.setText("GRUEN: Automatisch anonymisiert!")
+                self.lbl_status_detail.setText("GRÜN: Automatisch anonymisiert!")
                 self.txt_original.setPlainText(text)
                 self.txt_anon.setPlainText(anon)
             else:
-                self.lbl_status_detail.setText("GRUEN: Sauber - Keine sensiblen Daten.")
+                self.lbl_status_detail.setText("GRÜN: Sauber - Keine sensiblen Daten.")
 
     def _restore_history(self):
         r = self.list_history.currentRow()

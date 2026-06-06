@@ -190,6 +190,15 @@ def write_profile_payload(path: Path, payload: Dict[str, Any]) -> None:
 def read_profile_payload(path: Path) -> Dict[str, Any]:
     return normalize_profile_payload(json.loads(path.read_text(encoding="utf-8")))
 
+
+def read_first_column_values(path: Path) -> List[str]:
+    if path.suffix == ".xlsx":
+        df = pd.read_excel(path, header=None)
+        if df.empty:
+            return []
+        return df.iloc[:, 0].dropna().astype(str).tolist()
+    return path.read_text(encoding="utf-8").splitlines()
+
 # --- Stylesheet (Modernes Design) ---
 STYLESHEET = """
 QMainWindow { background-color: #f0f2f5; }
@@ -669,14 +678,7 @@ class AmpelTool(QMainWindow):
         if not path.exists(): return
         try:
             target = self.sensitive if typ == "sensibel" else self.whitelist
-            if path.suffix == ".xlsx":
-                df = pd.read_excel(path, header=None)
-                if df.empty:
-                    content = []
-                else:
-                    content = df.iloc[:, 0].dropna().astype(str).tolist()
-            else:
-                content = path.read_text(encoding="utf-8").splitlines()
+            content = read_first_column_values(path)
             for item in content:
                 c = item.strip()
                 if c and c not in target: 

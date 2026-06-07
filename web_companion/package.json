@@ -1,0 +1,11 @@
+{
+  "name": "ampelclip-web",
+  "version": "1.0.0",
+  "description": "AmpelClip Web Companion — lokale Datenschutz-Anonymisierung als PWA",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/library.test.mjs tests/pwa.test.mjs"
+  },
+  "keywords": ["datenschutz", "anonymisierung", "pwa"],
+  "license": "MIT"
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AmpelClip Web</title>
+  <link rel="stylesheet" href="app.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="Datenschutz-Anonymisierung für Texte — lokal im Browser">
+</head>
+<body>
+
+<header class="app-header">
+  <span class="app-header__logo">🚦</span>
+  <div>
+    <div class="app-header__title">AmpelClip Web</div>
+    <div class="app-header__sub">Lokale Datenschutz-Anonymisierung</div>
+  </div>
+  <button id="btn-install" class="app-header__install">App installieren</button>
+</header>
+
+<main class="app-body">
+
+  <!-- ── Profil-Panel ── -->
+  <aside class="panel">
+    <div class="panel__title">Profil</div>
+
+    <div class="btn-row">
+      <button id="btn-import" class="btn btn--primary">Profil laden</button>
+      <button id="btn-export" class="btn">Exportieren</button>
+      <button id="btn-reset" class="btn">Zurücksetzen</button>
+    </div>
+    <input id="file-input" type="file" accept=".json,application/json" class="sr-only" style="display:none">
+
+    <div>
+      <div class="panel__title" style="margin-bottom:.4rem">Ampel-Status</div>
+      <div class="ampel-badge">
+        <span id="ampel-dot" class="ampel-dot"></span>
+        <span id="ampel-label"></span>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel__title" style="margin-bottom:.4rem">Optionen</div>
+      <label class="check-row">
+        <input type="checkbox" id="chk-case">
+        Groß-/Kleinschreibung beachten
+      </label>
+      <label class="check-row" style="margin-top:.4rem">
+        <input type="checkbox" id="chk-words">
+        Nur ganze Wörter
+      </label>
+    </div>
+
+    <div>
+      <div class="panel__title" style="margin-bottom:.4rem">Eingebaute Muster</div>
+      <ul id="builtin-list"></ul>
+    </div>
+
+    <div class="list-editor">
+      <div class="list-editor__label">Sensible Begriffe → [ANONYM]</div>
+      <div class="list-editor__input-row">
+        <input id="sensibel-input" class="list-editor__input" type="text" placeholder="Begriff hinzufügen">
+        <button id="sensibel-add" class="btn">+</button>
+      </div>
+      <ul id="sensibel-items" class="list-editor__items"></ul>
+    </div>
+
+    <div class="list-editor">
+      <div class="list-editor__label">Whitelist (immer freilassen)</div>
+      <div class="list-editor__input-row">
+        <input id="white-input" class="list-editor__input" type="text" placeholder="Freigegebenen Begriff hinzufügen">
+        <button id="white-add" class="btn">+</button>
+      </div>
+      <ul id="white-items" class="list-editor__items"></ul>
+    </div>
+  </aside>
+
+  <!-- ── Text-Panel ── -->
+  <section class="text-panel">
+
+    <div class="panel">
+      <div class="panel__title">Originaltext</div>
+      <div class="textarea-wrap">
+        <textarea id="text-original" class="editor" placeholder="Text hier einfügen…"></textarea>
+      </div>
+      <div class="btn-row">
+        <button id="btn-anonymize" class="btn btn--success">Anonymisieren</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel__title">Anonymisierter Text</div>
+      <div class="textarea-wrap">
+        <textarea id="text-result" class="editor editor--output" readonly placeholder="Hier erscheint das Ergebnis…"></textarea>
+      </div>
+      <div class="btn-row">
+        <button id="btn-copy" class="btn">In Zwischenablage kopieren</button>
+      </div>
+    </div>
+
+    <div id="status" class="status-bar"></div>
+
+  </section>
+
+</main>
+
+<script type="module" src="library.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

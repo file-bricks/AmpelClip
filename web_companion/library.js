@@ -17,7 +17,7 @@ export const BUILTIN_PATTERNS = {
   },
   phone_de: {
     name: 'Telefonnummern (DE)',
-    regex: String.raw`\b(?:\+49|0049|0)[\s.\-]?(?:\d{2,4})[\s.\-]?(?:\d{3,})[\s.\-]?(?:\d{2,})\b`,
+    regex: String.raw`(?<![\p{L}\p{N}])(?:\+49|0049|0)[\s.\-]?(?:\d{2,4})[\s.\-]?(?:\d{3,})[\s.\-]?(?:\d{2,})\b`,
     token: '[TELEFON]',
     defaultEnabled: false,
   },

@@ -165,6 +165,27 @@ test('substituteOutsideSpans lässt geschützten Bereich intakt', () => {
   assert.equal(result, 'X BBB X')
 })
 
+// ── Regression: phone_de +49-Format (Bug #1 Fix) ─────────────────────────────
+
+test('phone_de-Muster erkennt +49-Format (Bug #1 — \\b blockierte \\+49)', () => {
+  const profile = createDefaultProfile()
+  profile.builtin_patterns.phone_de = true
+  const text = 'Ruf +49 151 12345678 an oder 0049 151 12345678 oder 0151 12345678.'
+  const result = anonymizeText(text, profile)
+  assert.ok(result.includes('[TELEFON]'), `Kein [TELEFON]-Token gefunden in: ${result}`)
+  assert.ok(!result.includes('+49 151 12345678'), `+49-Nummer nicht anonymisiert`)
+  assert.ok(!result.includes('0049 151 12345678'), `0049-Nummer nicht anonymisiert`)
+  assert.ok(!result.includes('0151 12345678'), `0151-Nummer nicht anonymisiert`)
+})
+
+test('phone_de-Lookbehind blockiert Ziffer/Buchstabe direkt vor +49 (kein Falsch-Positiv)', () => {
+  const profile = createDefaultProfile()
+  profile.builtin_patterns.phone_de = true
+  const text = 'abc49 151 12345678 und 123+49151234567 bleiben unberührt'
+  const result = anonymizeText(text, profile)
+  assert.equal(result, text, `Kein Match erwartet, aber Treffer in: ${result}`)
+})
+
 // ── Regression: Stale-Span PII-Leak ──────────────────────────────────────────
 
 test('Stale-Span-Regression: Sensibel-Ersatz verschiebt keine Whitelist-Grenzen (PII-Leak-Check)', () => {

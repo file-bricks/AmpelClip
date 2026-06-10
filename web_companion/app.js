@@ -66,7 +66,11 @@ function loadProfile() {
 }
 
 function saveProfile() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(profile))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile))
+  } catch {
+    setStatus('Einstellungen konnten nicht gespeichert werden (Privater Modus?).', true)
+  }
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -205,8 +209,10 @@ elExportBtn.addEventListener('click', () => {
   const a = document.createElement('a')
   a.href = url
   a.download = 'ampelclip-profile.json'
+  document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(url)
+  document.body.removeChild(a)
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
   setStatus('Profil exportiert.')
 })
 

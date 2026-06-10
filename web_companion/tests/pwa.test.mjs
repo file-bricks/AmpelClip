@@ -75,3 +75,23 @@ test('app.js importiert anonymizeText aus library.js', () => {
   assert.ok(js.includes('anonymizeText'))
   assert.ok(js.includes('./library.js'))
 })
+
+test('saveProfile ist gegen localStorage-Fehler gesichert (Bug #3 Fix — Safari Private Mode)', () => {
+  const js = readFileSync(path.join(root, 'app.js'), 'utf8')
+  const saveProfileFn = js.slice(js.indexOf('function saveProfile()'))
+    .split(/\n(?=function )/)[0]
+  assert.ok(saveProfileFn.includes('try'), 'saveProfile muss localStorage.setItem in try/catch wrappen')
+  assert.ok(saveProfileFn.includes('catch'), 'saveProfile braucht catch-Block')
+})
+
+test('Export-Anchor wird zum DOM hinzugefügt (Bug #2 Fix — Firefox/Safari detached click)', () => {
+  const js = readFileSync(path.join(root, 'app.js'), 'utf8')
+  assert.ok(js.includes('document.body.appendChild'), 'Anchor muss zum DOM hinzugefügt werden')
+  assert.ok(js.includes('document.body.removeChild'), 'Anchor muss nach dem Klick entfernt werden')
+})
+
+test('Blob-URL-Revoke verwendet setTimeout (Bug #2 Fix — synchrones Revoke bricht Safari)', () => {
+  const js = readFileSync(path.join(root, 'app.js'), 'utf8')
+  assert.ok(js.includes('setTimeout') && js.includes('revokeObjectURL'),
+    'URL.revokeObjectURL muss per setTimeout verzögert aufgerufen werden')
+})

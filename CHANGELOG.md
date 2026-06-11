@@ -5,13 +5,23 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed
+- Whitelist-Einträge schützen jetzt auch Treffer aus eingebauten Regex-Patterns. Vorher wurden z. B. freigegebene E-Mail-Adressen trotz Whitelist weiter anonymisiert, sobald das eingebaute E-Mail-Pattern aktiv war.
+- Regressionstest ergänzt: Whitelist bewahrt freigegebene Builtin-Regex-Treffer, während andere Treffer im selben Text weiter anonymisiert werden.
+
 ### Geändert / Changed
 - README als klarere GitHub-Landing-Page mit English-first Einstieg, Suchkontext, korrekter MIT-Lizenz und echter Umlautschreibung überarbeitet.
-- `llms.txt` als maschinenlesbarer Projektkontext ergänzt.
+- `llms.txt` mit `## Audience`, `## Search Phrases` (Fenced-Block-Format) und `## Last-checked` auf aktuellen Standard gebracht.
 - Community-Workflows auf aktuelle Action-Versionen aktualisiert.
+- `.gitignore` um Muster für Entwicklungs-Artefakte (`*.bak`, `*_FINAL_*`) erweitert.
+- `build_exe.bat` als Hilfsskript für reproduzierbare Builds hinzugefügt.
+
+### Build / Release
+- EXE neu gebaut 2026-06-01 (PyInstaller, `AmpelTool_V6.spec`); Smoke-Test bestanden (Prozess stabil nach 8 s). Vorherige EXE war vom 2026-05-17, Source (`Ampel6.py`) vom 2026-06-01.
 
 ### Hinzugefügt / Added
-- Portierungsplan für Windows Store, Web/PWA-Companion, Android/iOS-PWA-Smokes sowie macOS/Linux-Source-Smokes ergänzt.
+- Desktop-Export und -Import für `ampelclip-profile-v1.json` ergänzt; das Profil enthält Ampel-Modus, Regex-Schalter, Sensibel-Liste und Whitelist, aber keine Clipboard-Historie, Rohtexte oder lokalen Dateipfade.
+- Regressionstests für Profil-Schema, UTF-8/Umlaute, Alias-Import und falsche Schema-Version ergänzt.
 - Austauschformat `ampelclip-profile-v1.json` für spätere plattformübergreifende Profilübergabe skizziert.
 - Planungsordner `web_companion/` für eine spätere PWA-Linie angelegt.
 

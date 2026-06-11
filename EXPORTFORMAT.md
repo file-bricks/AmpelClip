@@ -1,6 +1,6 @@
 # Exportformat AmpelClip
 
-Stand: 2026-05-26
+Stand: 2026-06-01
 
 ## Zweck
 
@@ -21,7 +21,8 @@ ampelclip-profile-v1.json
   "schema_version": "ampelclip-profile-v1",
   "app": {
     "name": "AmpelClip",
-    "exported_at": "2026-05-26T00:00:00+02:00"
+    "version": "6",
+    "exported_at": "2026-06-01T08:30:00+00:00"
   },
   "settings": {
     "ampel_status": "gelb",
@@ -32,8 +33,8 @@ ampelclip-profile-v1.json
     "iban": true,
     "email": true,
     "phone_de": false,
-    "credit_card": false,
-    "postal_code_de": false,
+    "creditcard": false,
+    "postcode_de": false,
     "date_de": false
   },
   "lists": {
@@ -51,6 +52,8 @@ ampelclip-profile-v1.json
 - Clipboard-Historie, Rohtexte und lokale Dateipfade werden nicht exportiert.
 - Listenwerte werden als UTF-8 geschrieben und müssen echte deutsche Umlaute erhalten.
 
-## Nächster Umsetzungsschritt
+## Implementierungsstand
 
-Die Desktop-App sollte eine Funktion `build_profile_export_payload()` erhalten, die dieses Profil ohne Seiteneffekte erzeugt. Darauf aufbauend können GUI-Export, GUI-Import und spätere Web/PWA-Nutzung getestet werden.
+Die Desktop-App erzeugt das Profil über `build_profile_export_payload()` ohne Seiteneffekte. Im Tab `Listenverwaltung` stehen `Profil exportieren` und `Profil importieren` bereit. Der Import akzeptiert zusätzlich die frühen Alias-Schlüssel `credit_card` und `postal_code_de`, normalisiert sie aber auf die aktuellen App-Schlüssel `creditcard` und `postcode_de`.
+
+Regressionstests in `tests/test_profile_format.py` sichern ab, dass echte Umlaute erhalten bleiben und weder Clipboard-Historie noch lokale Dateipfade oder Rohtexte in das Profil gelangen.

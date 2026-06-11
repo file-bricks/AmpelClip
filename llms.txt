@@ -5,6 +5,13 @@ Organization: file-bricks
 License: MIT
 Primary audience: Windows users who need a local clipboard privacy helper before pasting sensitive text into documents, tickets, chats, LLM prompts or web forms.
 
+## Audience
+
+- Privacy-conscious Windows users who paste sensitive text into documents, tickets, chats, LLM prompts or web forms
+- Developers building privacy-aware clipboard utilities or local-first desktop tools
+- IT and data-protection teams looking for lightweight clipboard monitoring without cloud dependencies
+- PySide6 / Python desktop app developers interested in clipboard integration patterns
+
 ## Summary
 
 AmpelClip is a local-first PySide6 desktop app for Windows clipboard monitoring and anonymization support. It detects sensitive clipboard content through built-in regex patterns and user-provided sensitive/whitelist terms. The app uses a traffic-light workflow: red for monitor-only, yellow for preview, and green for automatic replacement with `[ANONYM]`.
@@ -24,8 +31,12 @@ AmpelClip is not a complete data-loss-prevention system and does not guarantee f
 
 ## Search Phrases
 
-- AmpelClip clipboard privacy monitor
-- file-bricks AmpelClip
-- local clipboard anonymization PySide6
-- Windows clipboard redaction helper
-- privacy traffic light clipboard tool
+```
+AmpelClip clipboard privacy monitor
+file-bricks AmpelClip
+local clipboard anonymization PySide6
+Windows clipboard redaction helper
+privacy traffic light clipboard tool
+```
+
+## Last-checked: 2026-06-11

@@ -1,4 +1,4 @@
-# Backup / alte Versionen
+﻿# Backup / alte Versionen
 _backup/
 
 # Python
@@ -42,3 +42,11 @@ config.json
 
 # Logs
 *.log
+DECISIONS.md
+PORTIERUNGSPLAN.md
+TODO.md
+DONE.md
+
+# Development artifacts (backup and working copies)
+*.bak
+*_FINAL_*

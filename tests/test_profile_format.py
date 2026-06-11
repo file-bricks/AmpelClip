@@ -1,9 +1,11 @@
 import json
+import re
 from datetime import datetime, timezone
 
 import pytest
 
 from Ampel6 import (
+    AmpelTool,
     BUILTIN_PATTERNS,
     PROFILE_SCHEMA_VERSION,
     build_profile_export_payload,
@@ -100,3 +102,15 @@ def test_profile_import_normalizes_old_pattern_aliases_and_ignores_history():
 def test_profile_import_rejects_wrong_schema():
     with pytest.raises(ValueError, match="Nicht unterstütztes Profilformat"):
         normalize_profile_payload({"schema_version": "ampelclip-profile-v2"})
+
+
+def test_whitelist_preserves_builtin_regex_matches():
+    tool = AmpelTool.__new__(AmpelTool)
+    tool.whitelist = ["kontakt@firma.de"]
+    tool.case_sensitive = False
+    tool.whole_words = False
+    tool.patterns = [re.compile(BUILTIN_PATTERNS["email"]["regex"], re.IGNORECASE)]
+
+    result = tool._anonymize("kontakt@firma.de und intern@firma.de")
+
+    assert result == "kontakt@firma.de und [ANONYM]"

@@ -112,6 +112,54 @@ def _normalized_builtin_patterns(
     return state
 
 
+def _collect_literal_spans(
+    text: str,
+    terms: List[str],
+    *,
+    case_sensitive: bool,
+    whole_words: bool,
+) -> List[Tuple[int, int]]:
+    flags = 0 if case_sensitive else re.IGNORECASE
+    spans: List[Tuple[int, int]] = []
+    for term in terms:
+        escaped = re.escape(term)
+        pattern = rf"(?<!\w){escaped}(?!\w)" if whole_words else escaped
+        for match in re.finditer(pattern, text, flags):
+            spans.append((match.start(), match.end()))
+    if not spans:
+        return []
+    spans.sort()
+    merged: List[Tuple[int, int]] = [spans[0]]
+    for start, end in spans[1:]:
+        last_start, last_end = merged[-1]
+        if start <= last_end:
+            merged[-1] = (last_start, max(last_end, end))
+        else:
+            merged.append((start, end))
+    return merged
+
+
+def _substitute_outside_spans(
+    text: str,
+    pattern: re.Pattern,
+    replacement: str,
+    protected_spans: List[Tuple[int, int]],
+) -> str:
+    if not protected_spans:
+        return pattern.sub(replacement, text)
+
+    chunks: List[str] = []
+    cursor = 0
+    for start, end in protected_spans:
+        if cursor < start:
+            chunks.append(pattern.sub(replacement, text[cursor:start]))
+        chunks.append(text[start:end])
+        cursor = end
+    if cursor < len(text):
+        chunks.append(pattern.sub(replacement, text[cursor:]))
+    return "".join(chunks)
+
+
 def build_profile_export_payload(
     sensitive: List[str],
     whitelist: List[str],
@@ -782,8 +830,14 @@ class AmpelTool(QMainWindow):
     def _anonymize(self, text):
         if not text: 
             return ""
-        for pat in self.patterns: 
-            text = pat.sub("[ANONYM]", text)
+        protected_spans = _collect_literal_spans(
+            text,
+            self.whitelist,
+            case_sensitive=self.case_sensitive,
+            whole_words=self.whole_words,
+        )
+        for pat in self.patterns:
+            text = _substitute_outside_spans(text, pat, "[ANONYM]", protected_spans)
         return text
 
     # ---------------- CLIPBOARD LOGIK ----------------

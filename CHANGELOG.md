@@ -5,6 +5,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Separate German `README_de.md` with installation, workflow, limitations and search context.
+
+### Changed
+- README now links to the German README and sharpens the search/disambiguation context for local clipboard privacy, clipboard anonymization and redaction workflows.
+- `llms.txt` updated for the 2026-06-13 visibility check with additional search phrases and external-discovery notes.
+- Web Companion metadata now includes English discovery terms for clipboard privacy, local-first anonymization and redaction.
+
 ### Behoben / Fixed
 - Whitelist-Einträge schützen jetzt auch Treffer aus eingebauten Regex-Patterns. Vorher wurden z. B. freigegebene E-Mail-Adressen trotz Whitelist weiter anonymisiert, sobald das eingebaute E-Mail-Pattern aktiv war.
 - Regressionstest ergänzt: Whitelist bewahrt freigegebene Builtin-Regex-Treffer, während andere Treffer im selben Text weiter anonymisiert werden.

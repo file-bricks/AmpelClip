@@ -2,7 +2,7 @@
   "id": "/ampelclip/",
   "name": "AmpelClip Web",
   "short_name": "AmpelClip",
-  "description": "Datenschutz-Anonymisierung für Texte — lokal im Browser",
+  "description": "Local-first clipboard privacy and text anonymization helper for manual redaction workflows",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

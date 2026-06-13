@@ -23,9 +23,11 @@ AmpelClip is not a complete data-loss-prevention system and does not guarantee f
 ## Key Files
 
 - `README.md`: GitHub landing page, installation, use cases and limitations.
+- `README_de.md`: German landing page with local clipboard privacy positioning.
 - `Ampel6.py`: Main PySide6 application.
 - `config.example.json`: Example configuration.
 - `README/screenshots/main.png`: Main window screenshot.
+- `web_companion/`: PWA companion for manual browser-based anonymization and profile exchange.
 - `requirements.txt`: Python dependencies.
 - `LICENSE`: MIT license.
 
@@ -34,9 +36,17 @@ AmpelClip is not a complete data-loss-prevention system and does not guarantee f
 ```
 AmpelClip clipboard privacy monitor
 file-bricks AmpelClip
+local-first clipboard privacy tool
+Windows clipboard anonymization helper
 local clipboard anonymization PySide6
 Windows clipboard redaction helper
 privacy traffic light clipboard tool
+clipboard PII redaction desktop app
+PySide6 clipboard privacy utility
 ```
 
-## Last-checked: 2026-06-11
+## External Discovery Notes
+
+Current GitHub and web discovery is weak for broad clipboard-privacy searches. Exact `file-bricks AmpelClip` searches are the safest route. The repo should be pitched as a local-first clipboard redaction helper for manual privacy workflows, not as enterprise DLP or guaranteed anonymization.
+
+## Last-checked: 2026-06-13

@@ -1,5 +1,7 @@
 # AmpelClip
 
+[Deutsch](README_de.md)
+
 AmpelClip is a local-first Windows clipboard privacy monitor. It watches clipboard text, detects sensitive patterns such as IBANs, email addresses, German phone numbers and credit-card-like numbers, and helps anonymize copied content before it is pasted elsewhere.
 
 ![AmpelClip main window](README/screenshots/main.png)
@@ -71,41 +73,20 @@ pyinstaller --onefile --noconsole --icon=ICO.ico --name=AmpelClip Ampel6.py
 
 ## Search Context
 
-AmpelClip is part of the `file-bricks` local-first desktop tools family. Useful search phrases:
+AmpelClip is part of the `file-bricks` local-first desktop tools family. It is closest to a clipboard redaction helper, not to a full DLP gateway, password manager, cloud content scanner or browser extension. Useful search phrases:
 
 - `AmpelClip clipboard privacy monitor`
 - `file-bricks AmpelClip`
+- `local-first clipboard privacy tool`
+- `Windows clipboard anonymization helper`
 - `local clipboard anonymization PySide6`
 - `Windows clipboard redaction helper`
 - `privacy traffic light clipboard tool`
+- `clipboard PII redaction desktop app`
 
-## Deutsch
+## German README
 
-AmpelClip ist ein lokales Windows-Tool zur Datenschutz-Unterstützung in der Zwischenablage. Es erkennt sensible Daten wie IBANs, E-Mail-Adressen, deutsche Telefonnummern und kreditkartenähnliche Zahlen in kopiertem Text und hilft, diese Inhalte vor dem Einfügen zu anonymisieren.
-
-### Funktionen
-
-- **Ampel-System**: Rot für reines Beobachten, Gelb für Vorschau, Grün für automatische Anonymisierung.
-- **Eingebaute Regex-Patterns**: IBAN, E-Mail, Telefon (DE), Kreditkarten, PLZ und Datum.
-- **Eigene Wortlisten**: Sensibel-Liste und Whitelist mit Import/Export für TXT und Excel.
-- **System-Tray-Integration**: Farbiges Icon zeigt den aktuellen Status.
-- **Clipboard-Verlauf**: Letzte 15 Einträge mit Wiederherstellen und anonymisiertem Kopieren.
-- **Live-Vorschau**: Original und anonymisierter Text nebeneinander.
-
-### Nutzung
-
-```bash
-git clone https://github.com/file-bricks/AmpelClip.git
-cd AmpelClip
-pip install -r requirements.txt
-python Ampel6.py
-```
-
-Oder über `START.bat`.
-
-### Wichtige Grenze
-
-AmpelClip garantiert keine vollständige Schwärzung oder Anonymisierung. Das Werkzeug unterstützt Datenschutz-Prozesse, kann sie aber nicht vollständig automatisieren. Manuelle Nachkontrolle ist Pflicht.
+A full German README is available in [README_de.md](README_de.md).
 
 ## License
 

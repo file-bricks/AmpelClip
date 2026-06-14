@@ -114,3 +114,26 @@ def test_whitelist_preserves_builtin_regex_matches():
     result = tool._anonymize("kontakt@firma.de und intern@firma.de")
 
     assert result == "kontakt@firma.de und [ANONYM]"
+
+
+def test_stale_span_multi_pattern_regression():
+    """Regression: protected_spans müssen nach jeder Pattern-Substitution neu berechnet
+    werden, damit PLZ/andere Patterns nicht fälschlich von verschobenen Whitelist-Spans
+    verdeckt werden (Privacy-Leak im GRÜN-Modus).
+    """
+    tool = AmpelTool.__new__(AmpelTool)
+    tool.whitelist = ["foo@bar.de"]
+    tool.case_sensitive = False
+    tool.whole_words = False
+    # Zwei Patterns: Email zuerst, dann Postleitzahl
+    tool.patterns = [
+        re.compile(BUILTIN_PATTERNS["email"]["regex"], re.IGNORECASE),
+        re.compile(BUILTIN_PATTERNS["postcode_de"]["regex"], re.IGNORECASE),
+    ]
+
+    result = tool._anonymize("secret@evil.com foo@bar.de 12345")
+
+    # foo@bar.de (whitelist) bleibt; secret@evil.com und 12345 werden anonymisiert
+    assert "foo@bar.de" in result, "Whitelisted email muss erhalten bleiben"
+    assert "[ANONYM]" in result, "Sensitive email muss anonymisiert werden"
+    assert "12345" not in result, "PLZ darf nicht durch stale whitelist-span geschützt werden"

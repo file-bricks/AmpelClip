@@ -615,8 +615,11 @@ class AmpelTool(QMainWindow):
                 self.case_sensitive = cfg.get("case_sensitive", False)
                 self.whole_words = cfg.get("whole_words", False)
                 
-                # NEU: Builtin Patterns laden
-                self.builtin_enabled = {**self.builtin_enabled, **cfg.get("builtin_patterns", {})}
+                # Builtin Patterns laden: Aliase auflösen + unbekannte Keys filtern
+                self.builtin_enabled = _normalized_builtin_patterns(
+                    cfg.get("builtin_patterns", {}),
+                    defaults={key: info["default"] for key, info in BUILTIN_PATTERNS.items()},
+                )
                 
                 self.cb_case.setChecked(self.case_sensitive)
                 self.cb_words.setChecked(self.whole_words)
@@ -828,15 +831,18 @@ class AmpelTool(QMainWindow):
         self._on_clipboard_change()
 
     def _anonymize(self, text):
-        if not text: 
+        if not text:
             return ""
-        protected_spans = _collect_literal_spans(
-            text,
-            self.whitelist,
-            case_sensitive=self.case_sensitive,
-            whole_words=self.whole_words,
-        )
         for pat in self.patterns:
+            # Recalculate protected spans against the current (possibly already
+            # partially anonymized) text so that whitelist offsets stay accurate
+            # even after earlier patterns have changed the string length.
+            protected_spans = _collect_literal_spans(
+                text,
+                self.whitelist,
+                case_sensitive=self.case_sensitive,
+                whole_words=self.whole_words,
+            )
             text = _substitute_outside_spans(text, pat, "[ANONYM]", protected_spans)
         return text
 

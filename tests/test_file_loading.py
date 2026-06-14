@@ -33,7 +33,9 @@ def test_excel_without_dropna_would_produce_nan(tmp_path):
     ws["A3"] = "Ende"    # Folgedaten zwingen pandas, die Leerzeile einzuschließen
     wb.save(tmp_path / "test.xlsx")
     df = pd.read_excel(tmp_path / "test.xlsx", header=None)
-    broken = df.iloc[:, 0].astype(str).tolist()   # altes Verhalten ohne dropna
+    # fillna("nan") + astype(str) simuliert das alte Verhalten zuverlässig
+    # über alle pandas-Versionen (neuere behalten NaN als float bei astype(str))
+    broken = df.iloc[:, 0].fillna("nan").astype(str).tolist()
     assert "nan" in broken, "Ohne dropna() enthält die Liste 'nan' — das ist der Bug"
     # read_first_column_values filtert die NaN-Zelle korrekt heraus:
     content = read_first_column_values(tmp_path / "test.xlsx")

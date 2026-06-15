@@ -1,6 +1,15 @@
+<img src="assets/banner.svg" width="100%" alt="AmpelClip Banner">
+
 # AmpelClip
 
-[Deutsch](README_de.md)
+**[English](README.md)** | [Deutsch](README_de.md)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)]()
+[![Offline-first](https://img.shields.io/badge/offline--first-yes-brightgreen.svg)]()
+
+> Local-first clipboard privacy guard — traffic-light workflow to detect and anonymize sensitive text before you paste it.
 
 AmpelClip is a local-first Windows clipboard privacy monitor. It watches clipboard text, detects sensitive patterns such as IBANs, email addresses, German phone numbers and credit-card-like numbers, and helps anonymize copied content before it is pasted elsewhere.
 

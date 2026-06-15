@@ -1,6 +1,15 @@
+<img src="assets/banner.svg" width="100%" alt="AmpelClip Banner">
+
 # AmpelClip
 
-[English](README.md)
+[English](README.md) | **[Deutsch](README_de.md)**
+
+[![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-green.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![Plattform: Windows](https://img.shields.io/badge/Plattform-Windows-lightgrey.svg)]()
+[![Offline-first](https://img.shields.io/badge/offline--first-ja-brightgreen.svg)]()
+
+> Lokaler Zwischenablage-Datenschutzwächter — Ampel-Workflow zum Erkennen und Anonymisieren sensibler Texte vor dem Einfügen.
 
 AmpelClip ist ein lokales Windows-Tool zur Datenschutz-Unterstützung in der Zwischenablage. Es erkennt sensible Daten wie IBANs, E-Mail-Adressen, deutsche Telefonnummern, kreditkartenähnliche Zahlen, Postleitzahlen und Datumsangaben in kopiertem Text und hilft, diese Inhalte vor dem Einfügen zu anonymisieren.
 

@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="100%" height="100%">
+  <!-- Definitions for Gradients, Shadows and Fonts -->
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&amp;family=Space+Grotesk:wght@500;700&amp;display=swap');
+      .title-text {
+        font-family: 'Space Grotesk', 'Outfit', -apple-system, sans-serif;
+        font-weight: 700;
+        font-size: 80px;
+        fill: #FFFFFF;
+      }
+      .title-highlight {
+        fill: url(#textGrad);
+      }
+      .tagline-text {
+        font-family: 'Outfit', -apple-system, sans-serif;
+        font-weight: 500;
+        font-size: 26px;
+        fill: #94A3B8;
+        letter-spacing: 2px;
+      }
+      .glow-red { filter: url(#glowRedFilter); }
+      .glow-yellow { filter: url(#glowYellowFilter); }
+      .glow-green { filter: url(#glowGreenFilter); }
+      .glow-blue { filter: url(#glowBlueFilter); }
+    </style>
+    
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070A13"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#0A0E17"/>
+    </linearGradient>
+    
+    <!-- Text Highlight Gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+
+    <!-- Ambient Background Glows -->
+    <radialGradient id="bgGlowLeft" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0"/>
+    </radialGradient>
+    
+    <radialGradient id="bgGlowRight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Clipboard & Metallic Gradients -->
+    <linearGradient id="clipboardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.8"/>
+    </linearGradient>
+
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94A3B8"/>
+      <stop offset="50%" stop-color="#E2E8F0"/>
+      <stop offset="100%" stop-color="#64748B"/>
+    </linearGradient>
+    
+    <!-- Lock Gradients -->
+    <linearGradient id="lockBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+    
+    <linearGradient id="shackleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+
+    <!-- Glow Filters -->
+    <filter id="glowRedFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="glowYellowFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="glowGreenFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="glowBlueFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- Drop Shadow for Cards -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1200" height="340" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Grid Pattern for tech aesthetic -->
+  <g opacity="0.03">
+    <path d="M 0,20 L 1200,20 M 0,40 L 1200,40 M 0,60 L 1200,60 M 0,80 L 1200,80 M 0,100 L 1200,100 M 0,120 L 1200,120 M 0,140 L 1200,140 M 0,160 L 1200,160 M 0,180 L 1200,180 M 0,200 L 1200,200 M 0,220 L 1200,220 M 0,240 L 1200,240 M 0,260 L 1200,260 M 0,280 L 1200,280 M 0,300 L 1200,300 M 0,320 L 1200,320" stroke="#FFFFFF" stroke-width="1"/>
+    <path d="M 40,0 L 40,340 M 80,0 L 80,340 M 120,0 L 120,340 M 160,0 L 160,340 M 200,0 L 200,340 M 240,0 L 240,340 M 280,0 L 280,340 M 320,0 L 320,340 M 360,0 L 360,340 M 400,0 L 400,340 M 440,0 L 440,340 M 480,0 L 480,340 M 520,0 L 520,340 M 560,0 L 560,340 M 600,0 L 600,340 M 640,0 L 640,340 M 680,0 L 680,340 M 720,0 L 720,340 M 760,0 L 760,340 M 800,0 L 800,340 M 840,0 L 840,340 M 880,0 L 880,340 M 920,0 L 920,340 M 960,0 L 960,340 M 1000,0 L 1000,340 M 1040,0 L 1040,340 M 1080,0 L 1080,340 M 1120,0 L 1120,340 M 1160,0 L 1160,340" stroke="#FFFFFF" stroke-width="1"/>
+  </g>
+
+  <!-- Ambient Glows -->
+  <circle cx="230" cy="180" r="180" fill="url(#bgGlowLeft)"/>
+  <circle cx="950" cy="170" r="220" fill="url(#bgGlowRight)"/>
+
+  <!-- ==================== LEFT SCENE (x:80..500, y:60..300) ==================== -->
+  
+  <!-- Outer Shield Boundary (Privacy Symbolism) -->
+  <path d="M 230,70 C 290,70 330,85 360,105 C 360,180 340,240 230,285 C 120,240 100,180 100,105 C 130,85 170,70 230,70 Z" fill="none" stroke="#1E293B" stroke-width="3" opacity="0.8"/>
+  <path d="M 230,75 C 285,75 322,89 350,108 C 350,175 330,230 230,273 C 130,230 110,175 110,108 C 138,89 175,75 230,75 Z" fill="none" stroke="url(#textGrad)" stroke-width="1.5" opacity="0.3" stroke-dasharray="8 6"/>
+
+  <!-- 1. Clipboard Base (Clip) -->
+  <g transform="translate(145, 90)" filter="url(#shadow)">
+    <!-- Clipboard Board -->
+    <rect width="170" height="180" rx="16" fill="url(#clipboardGrad)" stroke="#334155" stroke-width="2"/>
+    <!-- Inner Paper Guideline -->
+    <rect x="12" y="35" width="146" height="133" rx="8" fill="url(#paperGrad)" stroke="#1E293B" stroke-width="1"/>
+    
+    <!-- Clipboard Lines (subtle background code lines) -->
+    <line x1="25" y1="55" x2="85" y2="55" stroke="#334155" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <line x1="25" y1="75" x2="65" y2="75" stroke="#334155" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    
+    <!-- 2. Traffic Light Casing (integrated inside the clipboard) -->
+    <rect x="95" y="45" width="50" height="115" rx="12" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+    
+    <!-- Traffic Light Lamps (Red, Yellow, Green) -->
+    <!-- Red Light (Active/Alert - Shielding state) -->
+    <circle cx="120" cy="67" r="11" fill="#EF4444" class="glow-red"/>
+    <circle cx="120" cy="67" r="6" fill="#FCA5A5" opacity="0.8"/>
+    
+    <!-- Yellow Light (Transitioning/Inspecting) -->
+    <circle cx="120" cy="102" r="11" fill="#F59E0B" opacity="0.4"/>
+    <circle cx="120" cy="102" r="11" fill="#F59E0B" class="glow-yellow"/>
+    
+    <!-- Green Light (Safe/Allowed) -->
+    <circle cx="120" cy="137" r="11" fill="#10B981" opacity="0.4"/>
+    <circle cx="120" cy="137" r="11" fill="#10B981" class="glow-green"/>
+
+    <!-- Clipboard Metal Clip at the top -->
+    <path d="M 50,0 L 120,0 C 125,0 128,4 128,8 L 128,20 C 128,24 125,28 120,28 L 50,28 C 45,28 42,24 42,20 L 42,8 C 42,4 45,0 50,0 Z" fill="url(#metalGrad)" stroke="#475569" stroke-width="1"/>
+    <rect x="75" y="6" width="20" height="8" rx="2" fill="#334155" opacity="0.5"/>
+    <circle cx="60" cy="14" r="3" fill="#334155"/>
+    <circle cx="110" cy="14" r="3" fill="#334155"/>
+  </g>
+
+  <!-- 3. Padlock (Privacy Guard overlay on the clipboard) -->
+  <g transform="translate(120, 175)" filter="url(#shadow)">
+    <!-- Padlock Shackle (Locked position) -->
+    <path d="M 25,25 L 25,0 C 25,-12 35,-22 48,-22 C 61,-22 71,-12 71,0 L 71,25" fill="none" stroke="url(#shackleGrad)" stroke-width="10" stroke-linecap="round"/>
+    
+    <!-- Padlock Body -->
+    <rect width="96" height="72" rx="14" fill="url(#lockBodyGrad)" stroke="#38BDF8" stroke-width="1.5"/>
+    
+    <!-- Lock details/keyhole -->
+    <circle cx="48" cy="32" r="7" fill="#0F172A"/>
+    <path d="M 45,36 L 51,36 L 53,52 L 43,52 Z" fill="#0F172A"/>
+    
+    <!-- Lock status light (Green dot for safe) -->
+    <circle cx="80" cy="16" r="4" fill="#10B981" class="glow-green"/>
+  </g>
+
+  <!-- ==================== RIGHT CONTENT (x:480..1120, y:60..300) ==================== -->
+  <g transform="translate(480, 0)">
+    <!-- Wordmark -->
+    <text x="0" y="165" class="title-text">Ampel<tspan class="title-highlight">Clip</tspan></text>
+    
+    <!-- Subtitle / Tagline -->
+    <text x="5" y="215" class="tagline-text">CLIPBOARD PRIVACY GUARD</text>
+    
+    <!-- Feature Badges -->
+    <g transform="translate(5, 245)" opacity="0.85">
+      <!-- Badge 1: Traffic Light Indicator -->
+      <g transform="translate(0, 0)">
+        <rect width="115" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+        <circle cx="16" cy="14" r="5" fill="#EF4444"/>
+        <circle cx="28" cy="14" r="5" fill="#F59E0B"/>
+        <circle cx="40" cy="14" r="5" fill="#10B981"/>
+        <text x="52" y="18" font-family="'Outfit', sans-serif" font-weight="600" font-size="11" fill="#94A3B8">MONITOR</text>
+      </g>
+      
+      <!-- Badge 2: Clipboard Protection -->
+      <g transform="translate(130, 0)">
+        <rect width="105" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+        <path d="M 16,10 L 22,10 L 22,18 L 16,18 Z" fill="none" stroke="#38BDF8" stroke-width="1.5"/>
+        <path d="M 14,12 L 14,20 L 20,20" fill="none" stroke="#38BDF8" stroke-width="1.5"/>
+        <text x="32" y="18" font-family="'Outfit', sans-serif" font-weight="600" font-size="11" fill="#38BDF8">CLIP SECURE</text>
+      </g>
+      
+      <!-- Badge 3: Privacy Shield -->
+      <g transform="translate(250, 0)">
+        <rect width="110" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+        <!-- Shield icon -->
+        <path d="M 18,9 C 21,9 22.5,8 24,7 C 24,12 22.5,16 18,18.5 C 13.5,16 12,12 12,7 C 13.5,8 15,9 18,9 Z" fill="none" stroke="#10B981" stroke-width="1.5"/>
+        <text x="34" y="18" font-family="'Outfit', sans-serif" font-weight="600" font-size="11" fill="#10B981">AUTO GUARD</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -344,16 +344,16 @@ class AmpelTool(QMainWindow):
         self.tray_icon.setToolTip("AmpelTool V6 Datenschutz")
         self._update_tray_icon_color()
 
-        tray_menu = QMenu()
+        self._tray_menu = QMenu(self)
         action_show = QAction("Anzeigen", self)
         action_show.triggered.connect(self.show_window)
-        tray_menu.addAction(action_show)
-        tray_menu.addSeparator()
+        self._tray_menu.addAction(action_show)
+        self._tray_menu.addSeparator()
         action_quit = QAction("Beenden", self)
         action_quit.triggered.connect(self.quit_app)
-        tray_menu.addAction(action_quit)
-        
-        self.tray_icon.setContextMenu(tray_menu)
+        self._tray_menu.addAction(action_quit)
+
+        self.tray_icon.setContextMenu(self._tray_menu)
         self.tray_icon.activated.connect(self._on_tray_click)
         self.tray_icon.show()
 

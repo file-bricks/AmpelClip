@@ -41,10 +41,11 @@ window.addEventListener('beforeinstallprompt', e => {
 
 elInstallBtn.addEventListener('click', async () => {
   if (!deferInstall) return
-  deferInstall.prompt()
-  const { outcome } = await deferInstall.userChoice
-  if (outcome === 'accepted') elInstallBtn.classList.remove('visible')
+  const prompt = deferInstall
   deferInstall = null
+  prompt.prompt()
+  const { outcome } = await prompt.userChoice
+  if (outcome === 'accepted') elInstallBtn.classList.remove('visible')
 })
 
 // ── Service Worker ────────────────────────────────────────────────────────────

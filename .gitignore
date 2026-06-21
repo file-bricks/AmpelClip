@@ -35,10 +35,19 @@ Desktop.ini
 
 # BACH Interne Steuerungsdateien
 AUFGABEN.txt
+LOCK*.txt
 
 # User-State (wird beim ersten Start aus In-Code-Defaults neu erzeugt;
 # Template liegt in config.example.json)
 config.json
+.env
+.env.*
+credentials.json
+client_secret*.json
+token.json
+*.db
+*.sqlite
+*.sqlite3
 
 # Logs
 *.log
@@ -46,6 +55,7 @@ DECISIONS.md
 PORTIERUNGSPLAN.md
 TODO.md
 DONE.md
+docs/superpowers/
 
 # Development artifacts (backup and working copies)
 *.bak

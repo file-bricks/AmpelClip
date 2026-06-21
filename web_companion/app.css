@@ -20,6 +20,7 @@ body {
   color: var(--text);
   line-height: 1.5;
   min-height: 100dvh;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
 }
 
 /* ── Header ── */
@@ -85,6 +86,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: .45rem .85rem;
+  min-height: 44px;
   font-size: .875rem;
   cursor: pointer;
   background: var(--surface);

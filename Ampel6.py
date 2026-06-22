@@ -46,7 +46,7 @@ BUILTIN_PATTERNS = {
     },
     "email": {
         "name": "E-Mail Adressen",
-        "regex": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+        "regex": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
         "description": "name@domain.de",
         "default": True
     },
@@ -240,12 +240,20 @@ def read_profile_payload(path: Path) -> Dict[str, Any]:
 
 
 def read_first_column_values(path: Path) -> List[str]:
-    if path.suffix == ".xlsx":
+    if path.suffix.lower() == ".xlsx":
         df = pd.read_excel(path, header=None)
         if df.empty:
             return []
         return df.iloc[:, 0].dropna().astype(str).tolist()
-    return path.read_text(encoding="utf-8").splitlines()
+    # utf-8-sig entfernt ein evtl. BOM; bei Nicht-UTF-8-Listen (cp1252/Latin-1 aus
+    # Excel/Editor) auf cp1252 zurueckfallen, statt die Datei (und damit den
+    # Datenschutz-Schutz) STILL zu verwerfen (Exception wurde in _load_file_internal
+    # geschluckt -> Liste blieb leer, Nutzer glaubt geschuetzt zu sein).
+    try:
+        text = path.read_text(encoding="utf-8-sig")
+    except UnicodeDecodeError:
+        text = path.read_text(encoding="cp1252", errors="replace")
+    return text.splitlines()
 
 # --- Stylesheet (Modernes Design) ---
 STYLESHEET = """
@@ -340,6 +348,10 @@ class AmpelTool(QMainWindow):
 
     # ---------------- SYSTEM TRAY LOGIK ----------------
     def _setup_tray(self):
+        # Ohne verfuegbaren System-Tray darf die App beim Schliessen NICHT in den
+        # Tray verstecken (sonst unsichtbar + nicht mehr erreichbar, da
+        # setQuitOnLastWindowClosed(False) gesetzt ist). Flag steuert den closeEvent.
+        self._tray_available = QSystemTrayIcon.isSystemTrayAvailable()
         self.tray_icon = QSystemTrayIcon(self)
         self.tray_icon.setToolTip("AmpelTool V6 Datenschutz")
         self._update_tray_icon_color()
@@ -393,14 +405,21 @@ class AmpelTool(QMainWindow):
     def closeEvent(self, event):
         if self.force_quit:
             event.accept()
-        else:
-            event.ignore()
-            self.hide()
-            self.tray_icon.showMessage(
-                "AmpelTool minimiert",
-                "Läuft im Hintergrund weiter.",
-                QSystemTrayIcon.MessageIcon.Information, 2000
-            )
+            return
+        if not getattr(self, "_tray_available", True):
+            # Kein System-Tray -> normal beenden, sonst liefe die App unsichtbar
+            # weiter (setQuitOnLastWindowClosed(False)).
+            self._save_config()
+            event.accept()
+            QApplication.quit()
+            return
+        event.ignore()
+        self.hide()
+        self.tray_icon.showMessage(
+            "AmpelTool minimiert",
+            "Läuft im Hintergrund weiter.",
+            QSystemTrayIcon.MessageIcon.Information, 2000
+        )
 
     # ---------------- TAB: LISTENVERWALTUNG ----------------
     def _setup_tab_data(self):
@@ -609,9 +628,13 @@ class AmpelTool(QMainWindow):
             try:
                 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
                     cfg = json.load(f)
-                for path, typ in cfg.get("files", []):
-                    self._load_file_internal(path, typ)
-                self.ampel_status = cfg.get("ampel_status", "rot")
+                for entry in cfg.get("files", []):
+                    # Einzelnen fehlerhaften Eintrag ueberspringen, statt das ganze
+                    # Config-Laden (Status/Patterns/Checkboxes) abzubrechen.
+                    if not (isinstance(entry, (list, tuple)) and len(entry) == 2):
+                        continue
+                    self._load_file_internal(entry[0], entry[1])
+                self.ampel_status = _normalized_ampel_status(cfg.get("ampel_status"))
                 self.case_sensitive = cfg.get("case_sensitive", False)
                 self.whole_words = cfg.get("whole_words", False)
                 
@@ -650,8 +673,13 @@ class AmpelTool(QMainWindow):
             "builtin_patterns": self.builtin_enabled  # NEU
         }
         try:
-            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            # Atomar schreiben (tmp + replace): _save_config laeuft bei jedem Toggle/
+            # Add/Delete/Ampelwechsel -> ein Crash waehrend json.dump wuerde sonst eine
+            # leere/halbe config.json hinterlassen (Verlust aller Listen/Patterns).
+            tmp = CONFIG_PATH.with_suffix(".tmp")
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(cfg, f, indent=2)
+            tmp.replace(CONFIG_PATH)
         except Exception as e:
             logging.error(f"Config Save Error: {e}")
 

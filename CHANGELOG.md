@@ -16,6 +16,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - `.gitignore` now excludes project locks, local env/credential files, local databases and automation planning folders before publication.
 
 ### Behoben / Fixed
+- Whitelist-Teiltreffer innerhalb eines größeren sensiblen Regex-Treffers schützen den Match nicht mehr fälschlich. Dadurch bleiben IBANs oder ähnliche Formatdaten nicht mehr teilweise im Klartext, wenn z. B. nur eine Bankleitzahl in der Whitelist steht.
 - Whitelist-Einträge schützen jetzt auch Treffer aus eingebauten Regex-Patterns. Vorher wurden z. B. freigegebene E-Mail-Adressen trotz Whitelist weiter anonymisiert, sobald das eingebaute E-Mail-Pattern aktiv war.
 - Regressionstest ergänzt: Whitelist bewahrt freigegebene Builtin-Regex-Treffer, während andere Treffer im selben Text weiter anonymisiert werden.
 

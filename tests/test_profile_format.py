@@ -116,6 +116,21 @@ def test_whitelist_preserves_builtin_regex_matches():
     assert result == "kontakt@firma.de und [ANONYM]"
 
 
+def test_whitelist_substring_does_not_split_sensitive_builtin_match():
+    tool = AmpelTool.__new__(AmpelTool)
+    tool.whitelist = ["3704"]
+    tool.case_sensitive = False
+    tool.whole_words = False
+    tool.patterns = [re.compile(BUILTIN_PATTERNS["iban"]["regex"], re.IGNORECASE)]
+
+    result = tool._anonymize("Konto DE89 3704 0044 0532 0130 00 prüfen")
+
+    assert "[ANONYM]" in result
+    assert "DE89" not in result
+    assert "3704" not in result
+    assert "0044" not in result
+
+
 def test_stale_span_multi_pattern_regression():
     """Regression: protected_spans müssen nach jeder Pattern-Substitution neu berechnet
     werden, damit PLZ/andere Patterns nicht fälschlich von verschobenen Whitelist-Spans

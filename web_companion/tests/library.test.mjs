@@ -38,6 +38,17 @@ test('freigegebene E-Mail überlebt Builtin-Email-Pattern', () => {
   assert.ok(!result.includes('user@example.com'), 'user@example.com muss weg sein')
 })
 
+test('Whitelist-Substring spaltet keinen größeren IBAN-Treffer', () => {
+  const profile = createDefaultProfile()
+  profile.builtin_patterns.iban = true
+  profile.lists.whitelist = ['3704']
+  const result = anonymizeText('Konto DE89 3704 0044 0532 0130 00 prüfen', profile)
+  assert.ok(result.includes('[IBAN]'), `IBAN muss ersetzt werden, got: ${result}`)
+  assert.ok(!result.includes('DE89'), `IBAN-Präfix darf nicht stehen bleiben, got: ${result}`)
+  assert.ok(!result.includes('3704'), `Whitelist-Teil darf keinen Leak erzeugen, got: ${result}`)
+  assert.ok(!result.includes('0044'), `IBAN-Rest darf nicht stehen bleiben, got: ${result}`)
+})
+
 test('nicht-freigegebene E-Mail wird durch [EMAIL] ersetzt', () => {
   const profile = createDefaultProfile()
   profile.builtin_patterns.email = true

@@ -145,6 +145,7 @@ def _substitute_outside_spans(
     replacement: str,
     protected_spans: List[Tuple[int, int]],
 ) -> str:
+    protected_spans = _filter_spans_for_pattern(text, pattern, protected_spans)
     if not protected_spans:
         return pattern.sub(replacement, text)
 
@@ -158,6 +159,35 @@ def _substitute_outside_spans(
     if cursor < len(text):
         chunks.append(pattern.sub(replacement, text[cursor:]))
     return "".join(chunks)
+
+
+def _filter_spans_for_pattern(
+    text: str,
+    pattern: re.Pattern,
+    protected_spans: List[Tuple[int, int]],
+) -> List[Tuple[int, int]]:
+    if not protected_spans:
+        return []
+
+    pattern_spans = [
+        (match.start(), match.end())
+        for match in pattern.finditer(text)
+        if match.start() != match.end()
+    ]
+    if not pattern_spans:
+        return protected_spans
+
+    filtered: List[Tuple[int, int]] = []
+    for start, end in protected_spans:
+        is_subspan = any(
+            match_start <= start
+            and end <= match_end
+            and (match_start < start or end < match_end)
+            for match_start, match_end in pattern_spans
+        )
+        if not is_subspan:
+            filtered.append((start, end))
+    return filtered
 
 
 def build_profile_export_payload(

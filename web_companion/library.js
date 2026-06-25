@@ -88,6 +88,7 @@ export function collectLiteralSpans(text, terms, { caseSensitive, wholeWords }) 
 // Port of Python _substitute_outside_spans.
 // Applies regex replacement only in text segments NOT covered by protectedSpans.
 export function substituteOutsideSpans(text, regex, replacement, protectedSpans) {
+  protectedSpans = filterSpansForRegex(text, regex, protectedSpans)
   if (protectedSpans.length === 0) {
     return text.replace(regex, replacement)
   }
@@ -110,10 +111,33 @@ export function substituteOutsideSpans(text, regex, replacement, protectedSpans)
   return chunks.join('')
 }
 
+function filterSpansForRegex(text, regex, protectedSpans) {
+  if (protectedSpans.length === 0) return []
+
+  const flags = regex.flags.includes('g') ? regex.flags : `${regex.flags}g`
+  const scanRe = new RegExp(regex.source, flags)
+  const regexSpans = []
+  let match
+  while ((match = scanRe.exec(text)) !== null) {
+    const start = match.index
+    const end = start + match[0].length
+    if (start !== end) regexSpans.push([start, end])
+    if (match[0].length === 0) scanRe.lastIndex += 1
+  }
+
+  if (regexSpans.length === 0) return protectedSpans
+
+  return protectedSpans.filter(([start, end]) => !regexSpans.some(([matchStart, matchEnd]) =>
+    matchStart <= start &&
+    end <= matchEnd &&
+    (matchStart < start || end < matchEnd)
+  ))
+}
+
 // Main anonymization function.
-// Computes whitelist spans once on the ORIGINAL text, then applies all patterns
-// to each unprotected gap in a single pass — avoiding stale-index shifts from
-// length-changing replacements (which would leak PII past whitelisted spans).
+// Recomputes whitelist spans per pattern on the current text. This keeps offsets
+// correct after replacements and prevents whitelist substrings from splitting a
+// larger sensitive regex match such as an IBAN.
 export function anonymizeText(text, profile) {
   if (!text) return ''
 
@@ -142,24 +166,12 @@ export function anonymizeText(text, profile) {
 
   if (patterns.length === 0) return text
 
-  // Apply all patterns to a text segment in sequence.
-  const applyAll = seg => patterns.reduce((s, { re, token }) => s.replace(re, token), seg)
-
-  // Compute protected spans once on the original, unmodified text.
-  const spans = collectLiteralSpans(text, whitelistTerms, { caseSensitive, wholeWords })
-
-  if (spans.length === 0) return applyAll(text)
-
-  // Walk the original text: anonymize each gap, pass protected spans through verbatim.
-  const chunks = []
-  let cursor = 0
-  for (const [start, end] of spans) {
-    if (cursor < start) chunks.push(applyAll(text.slice(cursor, start)))
-    chunks.push(text.slice(start, end))
-    cursor = end
+  let result = text
+  for (const { re, token } of patterns) {
+    const spans = collectLiteralSpans(result, whitelistTerms, { caseSensitive, wholeWords })
+    result = substituteOutsideSpans(result, re, token, spans)
   }
-  if (cursor < text.length) chunks.push(applyAll(text.slice(cursor)))
-  return chunks.join('')
+  return result
 }
 
 function cleanUniqueStrings(arr) {

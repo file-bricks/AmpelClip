@@ -199,6 +199,13 @@ body {
 }
 .status-bar--error { color: var(--danger); }
 
+/* ── Ampel Hint ── */
+.ampel-hint {
+  font-size: .75rem;
+  color: var(--muted);
+  margin-top: .35rem;
+}
+
 /* ── Notice ── */
 .notice {
   padding: .5rem .75rem;

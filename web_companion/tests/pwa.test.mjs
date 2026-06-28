@@ -182,6 +182,24 @@ test('BUG-W6 regression: sw.js caches.match nutzt ignoreSearch:true', () => {
   )
 })
 
+// ── Ampel-Status-Toggle ───────────────────────────────────────────────────────
+
+test('index.html enthält btn-ampel-toggle', () => {
+  const html = readFileSync(path.join(root, 'index.html'), 'utf8')
+  assert.ok(html.includes('btn-ampel-toggle'), 'Ampel-Toggle-Button muss in index.html existieren')
+})
+
+test('app.js importiert nextAmpelStatus aus library.js', () => {
+  const js = readFileSync(path.join(root, 'app.js'), 'utf8')
+  assert.ok(js.includes('nextAmpelStatus'), 'app.js muss nextAmpelStatus aus library.js nutzen')
+  assert.ok(js.includes('./library.js'), 'nextAmpelStatus muss aus ./library.js importiert sein')
+})
+
+test('app.css enthält .ampel-hint für Hinweistext', () => {
+  const css = readFileSync(path.join(root, 'app.css'), 'utf8')
+  assert.ok(css.includes('ampel-hint'), 'app.css muss .ampel-hint-Klasse für den Hinweistext definieren')
+})
+
 // BUG-W5: deferInstall wird nach deferInstall.prompt() genullt statt davor → Doppel-Trigger
 // Fix: const prompt = deferInstall; deferInstall = null; BEVOR prompt.prompt()
 // Red-on-Revert: wenn fix zurückgedreht, liegt deferInstall = null im Handler NACH .prompt()

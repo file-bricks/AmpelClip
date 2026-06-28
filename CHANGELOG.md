@@ -5,6 +5,16 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Hinzugefügt / Added (2026-06-28)
+
+- **Ampel-Status-Toggle im Web Companion:** Der Ampel-Status (rot/gelb/grün) war bisher nur
+  als Anzeige sichtbar, aber nicht im Browser editierbar. Neu: Button „Status umschalten" wechselt
+  den Status im Zyklus rot → gelb → grün → rot und speichert ihn im localStorage. Der Status
+  steuert das Desktop-Verhalten beim Profil-Export; er hat keinen Effekt auf die Anonymisierung
+  im Browser — ein Hinweistext macht das transparent.
+  Reine Logik in `nextAmpelStatus()` (exportiert aus `library.js`, unit-getestet);
+  DOM-Wiring in `app.js`; 7 neue Tests (59/59 grün).
+
 ### Behoben / Fixed (Bugsweep 2026-06-28)
 
 - **_anonymize Performance (Bug 1):** `_anonymize` hatte O(P×W×N)-Komplexität und führte bei

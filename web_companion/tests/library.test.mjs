@@ -7,6 +7,7 @@ import {
   collectLiteralSpans,
   substituteOutsideSpans,
   BUILTIN_PATTERNS,
+  nextAmpelStatus,
 } from '../library.js'
 
 // ── Grundfunktionen ───────────────────────────────────────────────────────────
@@ -195,6 +196,24 @@ test('phone_de-Lookbehind blockiert Ziffer/Buchstabe direkt vor +49 (kein Falsch
   const text = 'abc49 151 12345678 und 123+49151234567 bleiben unberührt'
   const result = anonymizeText(text, profile)
   assert.equal(result, text, `Kein Match erwartet, aber Treffer in: ${result}`)
+})
+
+// ── nextAmpelStatus ───────────────────────────────────────────────────────────
+
+test('nextAmpelStatus: rot → gelb', () => {
+  assert.equal(nextAmpelStatus('rot'), 'gelb')
+})
+
+test('nextAmpelStatus: gelb → gruen', () => {
+  assert.equal(nextAmpelStatus('gelb'), 'gruen')
+})
+
+test('nextAmpelStatus: gruen → rot (Zyklus geschlossen)', () => {
+  assert.equal(nextAmpelStatus('gruen'), 'rot')
+})
+
+test('nextAmpelStatus: unbekannter Status → rot (Fallback)', () => {
+  assert.equal(nextAmpelStatus('ungueltig'), 'rot')
 })
 
 // ── Regression: Stale-Span PII-Leak ──────────────────────────────────────────

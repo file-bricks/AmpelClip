@@ -1,4 +1,4 @@
-import { anonymizeText, normalizeProfile, createDefaultProfile, BUILTIN_PATTERNS } from './library.js'
+import { anonymizeText, normalizeProfile, createDefaultProfile, BUILTIN_PATTERNS, nextAmpelStatus } from './library.js'
 
 const STORAGE_KEY = 'ampelclip-web-profile-v1'
 
@@ -17,6 +17,7 @@ const elExportBtn    = document.getElementById('btn-export')
 const elResetBtn     = document.getElementById('btn-reset')
 const elAmpelDot     = document.getElementById('ampel-dot')
 const elAmpelLabel   = document.getElementById('ampel-label')
+const elAmpelToggle  = document.getElementById('btn-ampel-toggle')
 const elCaseSens     = document.getElementById('chk-case')
 const elWholeWords   = document.getElementById('chk-words')
 const elBuiltinList  = document.getElementById('builtin-list')
@@ -215,6 +216,14 @@ elExportBtn.addEventListener('click', () => {
   document.body.removeChild(a)
   setTimeout(() => URL.revokeObjectURL(url), 1000)
   setStatus('Profil exportiert.')
+})
+
+// ── Ampel-Status-Toggle ───────────────────────────────────────────────────────
+
+elAmpelToggle.addEventListener('click', () => {
+  profile.settings.ampel_status = nextAmpelStatus(profile.settings.ampel_status)
+  saveProfile()
+  renderAmpel()
 })
 
 // ── Reset ─────────────────────────────────────────────────────────────────────

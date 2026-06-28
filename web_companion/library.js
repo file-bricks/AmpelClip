@@ -224,6 +224,14 @@ export function normalizeProfile(raw) {
   }
 }
 
+// Rotiert den Ampel-Status im Zyklus rot → gelb → gruen → rot.
+// Reine Logik, DOM-frei; unbekannter Status fällt auf 'rot' zurück.
+export function nextAmpelStatus(current) {
+  const cycle = ['rot', 'gelb', 'gruen']
+  const idx = cycle.indexOf(current)
+  return cycle[(idx + 1) % cycle.length]
+}
+
 // Returns a fresh default profile with iban+email enabled.
 export function createDefaultProfile() {
   return {

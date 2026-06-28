@@ -5,6 +5,26 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed (Bugsweep 2026-06-28)
+
+- **_anonymize Performance (Bug 1):** `_anonymize` hatte O(P×W×N)-Komplexität und führte bei
+  großen Whitelists (~500 Terme) und langem Clipboard-Text (~50.000 Zeichen) zu ~22 s GUI-Freeze.
+  Ersetzt durch Single-Pass O((P+W)×N): Whitelist-Spans werden einmal auf dem Originaltext
+  berechnet; alle Pattern-Matches auf dem gleichen Originaltext gesammelt, überlappende Spans
+  gemergt und in einem einzigen right-to-left-Durchlauf substituiert. Semantik (sichere Richtung):
+  alle Patterns gegen Originaltext, Ergebnis mindestens so schützend wie zuvor.
+
+- **clipboard_lock Re-Entry-Guard (Bug 2):** Auf Windows trifft das `dataChanged`-Signal nach
+  `clipboard.setText(anon)` verzögert ein (Nachrichtenqueue). Der `clipboard_lock`-Boolean war
+  beim Eintreffen des Signals bereits auf `False` zurückgesetzt — der Lock griff nicht, der selbst
+  geschriebene Anon-Text durchlief `_on_clipboard_change` erneut. Fix: `_last_written_text`
+  Re-Entry-Guard — eigener `setText`-Aufruf merkt den Text; kommt er über `dataChanged` zurück,
+  wird er ignoriert. Gilt für alle drei `setText`-Stellen.
+
+- **manage_translations.py Quote-Bug (Bug 3):** `STRING_PATTERNS` nutzte `[^"\']+` als
+  Zeichenklasse, die weder `"` noch `'` erlaubt — Strings mit Apostrophen wurden abgeschnitten.
+  Behoben durch getrennte Double-Quote- (`[^"]+`) und Single-Quote-Varianten (`[^']+`) pro Funktion.
+
 ### Added
 - Separate German `README_de.md` with installation, workflow, limitations and search context.
 - iOS/PWA installability assets: PNG app icons, Apple touch icon metadata, safe-area CSS and regression tests for install prompt, service worker offline fallback and query-insensitive cache hits.
@@ -16,6 +36,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - `.gitignore` now excludes project locks, local env/credential files, local databases and automation planning folders before publication.
 
 ### Behoben / Fixed
+- Die manuellen Sensibel-/Whitelist-Felder und die beiden Filterfelder exponieren jetzt sprechende Accessible Names, Descriptions und Tooltips, statt sich für Screenreader fast nur auf Position und Placeholder zu verlassen.
 - Whitelist-Teiltreffer innerhalb eines größeren sensiblen Regex-Treffers schützen den Match nicht mehr fälschlich. Dadurch bleiben IBANs oder ähnliche Formatdaten nicht mehr teilweise im Klartext, wenn z. B. nur eine Bankleitzahl in der Whitelist steht.
 - Whitelist-Einträge schützen jetzt auch Treffer aus eingebauten Regex-Patterns. Vorher wurden z. B. freigegebene E-Mail-Adressen trotz Whitelist weiter anonymisiert, sobald das eingebaute E-Mail-Pattern aktiv war.
 - Regressionstest ergänzt: Whitelist bewahrt freigegebene Builtin-Regex-Treffer, während andere Treffer im selben Text weiter anonymisiert werden.

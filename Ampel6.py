@@ -333,6 +333,7 @@ class AmpelTool(QMainWindow):
         self.case_sensitive = False
         self.whole_words = False
         self.clipboard_lock = False
+        self._last_written_text: str | None = None  # Re-Entry-Guard (Windows queued dataChanged)
         self.force_quit = False
 
         # GUI & System
@@ -375,6 +376,19 @@ class AmpelTool(QMainWindow):
         self._setup_tab_patterns()  # NEU
         self._setup_tab_ampel()
         self._setup_tab_history()
+
+    def _set_accessible_context(
+        self,
+        widget: QWidget,
+        *,
+        name: str,
+        description: str,
+        tooltip: str | None = None,
+    ) -> None:
+        widget.setAccessibleName(name)
+        widget.setAccessibleDescription(description)
+        if tooltip:
+            widget.setToolTip(tooltip)
 
     # ---------------- SYSTEM TRAY LOGIK ----------------
     def _setup_tray(self):
@@ -481,13 +495,37 @@ class AmpelTool(QMainWindow):
         
         self.entry_sens = QLineEdit(placeholderText="Neuer sensibler Begriff...")
         self.entry_sens.returnPressed.connect(lambda: self._add_manual(self.entry_sens, self.sensitive))
+        self._set_accessible_context(
+            self.entry_sens,
+            name="Sensiblen Begriff eingeben",
+            description="Feld für einen neuen sensiblen Begriff. Bestätigen Sie mit Eingabe oder dem roten Hinzufügen-Button.",
+            tooltip="Neuen sensiblen Begriff eingeben",
+        )
         btn_add_sens = QPushButton("Hinzufügen", objectName="Danger")
         btn_add_sens.clicked.connect(lambda: self._add_manual(self.entry_sens, self.sensitive))
+        self._set_accessible_context(
+            btn_add_sens,
+            name="Sensiblen Begriff hinzufügen",
+            description="Fügt den Begriff aus dem linken Eingabefeld zur Liste sensibler Daten hinzu.",
+            tooltip="Sensiblen Begriff zur roten Liste hinzufügen",
+        )
 
         self.entry_white = QLineEdit(placeholderText="Neuer Whitelist Begriff...")
         self.entry_white.returnPressed.connect(lambda: self._add_manual(self.entry_white, self.whitelist))
+        self._set_accessible_context(
+            self.entry_white,
+            name="Whitelist-Begriff eingeben",
+            description="Feld für einen neuen Whitelist-Begriff. Bestätigen Sie mit Eingabe oder dem grünen Hinzufügen-Button.",
+            tooltip="Neuen Whitelist-Begriff eingeben",
+        )
         btn_add_white = QPushButton("Hinzufügen", objectName="Success")
         btn_add_white.clicked.connect(lambda: self._add_manual(self.entry_white, self.whitelist))
+        self._set_accessible_context(
+            btn_add_white,
+            name="Whitelist-Begriff hinzufügen",
+            description="Fügt den Begriff aus dem rechten Eingabefeld zur Whitelist hinzu.",
+            tooltip="Whitelist-Begriff zur grünen Liste hinzufügen",
+        )
 
         manual_layout.addWidget(self.entry_sens)
         manual_layout.addWidget(btn_add_sens)
@@ -506,6 +544,12 @@ class AmpelTool(QMainWindow):
         l_sens.addWidget(QLabel("Sensible Daten (Rot)"))
         self.filter_sens = QLineEdit(placeholderText="Filter...")
         self.filter_sens.textChanged.connect(self._update_listboxes)
+        self._set_accessible_context(
+            self.filter_sens,
+            name="Sensible Daten filtern",
+            description="Filtert die Liste sensibler Daten nach dem eingegebenen Text.",
+            tooltip="Filter für sensible Daten",
+        )
         l_sens.addWidget(self.filter_sens)
         self.list_sens = QListWidget()
         self.list_sens.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
@@ -520,6 +564,12 @@ class AmpelTool(QMainWindow):
         l_white.addWidget(QLabel("Whitelist (Grün)"))
         self.filter_white = QLineEdit(placeholderText="Filter...")
         self.filter_white.textChanged.connect(self._update_listboxes)
+        self._set_accessible_context(
+            self.filter_white,
+            name="Whitelist filtern",
+            description="Filtert die Whitelist nach dem eingegebenen Text.",
+            tooltip="Filter für die Whitelist",
+        )
         l_white.addWidget(self.filter_white)
         self.list_white = QListWidget()
         self.list_white.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
@@ -889,32 +939,85 @@ class AmpelTool(QMainWindow):
         self._on_clipboard_change()
 
     def _anonymize(self, text):
+        """Ersetzt sensible Textstellen durch [ANONYM].
+
+        Single-Pass-Algorithmus (O((P+W)×N) statt O(P×W×N)):
+        Whitelist-Spans werden einmal auf dem Originaltext berechnet; alle
+        Pattern-Matches werden auf dem gleichen Originaltext gefunden und
+        in einem einzigen right-to-left-Durchlauf substituiert.
+
+        Semantische Anmerkung: Anders als beim früheren sequenziellen Ansatz
+        werden alle Patterns gegen den ORIGINALEN Text ausgewertet. Das Ergebnis
+        ist mindestens so schützend wie zuvor — in Grenzfällen mit sich
+        überschneidenden Patterns sogar konsequenter.
+        """
         if not text:
             return ""
+
+        # Whitelist-Spans einmal auf dem Originaltext berechnen (O(W×N))
+        protected_spans = _collect_literal_spans(
+            text,
+            self.whitelist,
+            case_sensitive=self.case_sensitive,
+            whole_words=self.whole_words,
+        )
+
+        # Alle zu ersetzenden Spans über alle Patterns sammeln
+        to_replace: List[Tuple[int, int]] = []
         for pat in self.patterns:
-            # Recalculate protected spans against the current (possibly already
-            # partially anonymized) text so that whitelist offsets stay accurate
-            # even after earlier patterns have changed the string length.
-            protected_spans = _collect_literal_spans(
-                text,
-                self.whitelist,
-                case_sensitive=self.case_sensitive,
-                whole_words=self.whole_words,
-            )
-            text = _substitute_outside_spans(text, pat, "[ANONYM]", protected_spans)
-        return text
+            # Privacy-Fix: Whitelist-Spans die vollständig von einem Pattern-Match
+            # überdeckt werden, schützen diesen Match nicht (IBAN-Teilstring-Bug)
+            effective_protected = _filter_spans_for_pattern(text, pat, protected_spans)
+            for m in pat.finditer(text):
+                start, end = m.start(), m.end()
+                if start == end:
+                    continue
+                # Match nur ersetzen wenn nicht durch Whitelist-Span geschützt
+                if not any(
+                    p_start <= start and end <= p_end
+                    for p_start, p_end in effective_protected
+                ):
+                    to_replace.append((start, end))
+
+        if not to_replace:
+            return text
+
+        # Überlappende Spans mergen
+        to_replace.sort()
+        merged: List[Tuple[int, int]] = []
+        cur_start, cur_end = to_replace[0]
+        for start, end in to_replace[1:]:
+            if start <= cur_end:
+                cur_end = max(cur_end, end)
+            else:
+                merged.append((cur_start, cur_end))
+                cur_start, cur_end = start, end
+        merged.append((cur_start, cur_end))
+
+        # Right-to-left substituieren (verhindert Offset-Verschiebung)
+        chars = list(text)
+        for start, end in reversed(merged):
+            chars[start:end] = list("[ANONYM]")
+        return "".join(chars)
 
     # ---------------- CLIPBOARD LOGIK ----------------
     def _on_clipboard_change(self):
-        if not hasattr(self, 'clipboard'): 
+        if not hasattr(self, 'clipboard'):
             return
-        if self.clipboard_lock: 
+        if self.clipboard_lock:
             return
-        
+
         data = self.clipboard.mimeData()
-        if not data.hasText(): 
+        if not data.hasText():
             return
         text = data.text()
+
+        # Re-Entry-Guard: eigenen Clipboard-Write ignorieren (Windows queued
+        # dataChanged — Signal trifft erst NACH setText() ein, wenn der bool-Lock
+        # längst zurückgesetzt wurde).
+        if text is not None and text == self._last_written_text:
+            self._last_written_text = None
+            return
         
         # History aktualisieren
         if not self.clip_history or self.clip_history[0] != text:
@@ -942,9 +1045,8 @@ class AmpelTool(QMainWindow):
                 self.lbl_status_detail.setText("GELB: Vorschau - Keine Treffer.")
         elif self.ampel_status == "gruen":
             if text != anon:
-                self.clipboard_lock = True
+                self._last_written_text = anon  # Re-Entry-Guard setzen
                 self.clipboard.setText(anon)
-                self.clipboard_lock = False
                 self.lbl_status_detail.setText("GRÜN: Automatisch anonymisiert!")
                 self.txt_original.setPlainText(text)
                 self.txt_anon.setPlainText(anon)
@@ -954,17 +1056,16 @@ class AmpelTool(QMainWindow):
     def _restore_history(self):
         r = self.list_history.currentRow()
         if r >= 0:
-            self.clipboard_lock = True
+            self._last_written_text = self.clip_history[r]  # Re-Entry-Guard setzen
             self.clipboard.setText(self.clip_history[r])
-            self.clipboard_lock = False
             self.statusBar().showMessage("Wiederhergestellt.")
 
     def _restore_history_anon(self):
         r = self.list_history.currentRow()
         if r >= 0:
-            self.clipboard_lock = True
-            self.clipboard.setText(self._anonymize(self.clip_history[r]))
-            self.clipboard_lock = False
+            anon = self._anonymize(self.clip_history[r])
+            self._last_written_text = anon  # Re-Entry-Guard setzen
+            self.clipboard.setText(anon)
             self.statusBar().showMessage("Anonymisiert kopiert.")
 
     def _clear_history(self):

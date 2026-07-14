@@ -1,0 +1,59 @@
+# Third-Party Licenses
+
+Project: AmpelClip
+Checked: 2026-07-14
+
+Project license:
+- AmpelClip is licensed under MIT according to `LICENSE`.
+
+Scope:
+- This inventory covers the direct Python runtime dependencies declared in
+  `requirements.txt` and the transitive runtime packages resolved in the
+  checked environment on 2026-07-14.
+- `web_companion/package.json` declares no external runtime or development
+  dependencies.
+- PyPI project metadata was checked on 2026-07-14 for package names, versions,
+  license metadata and project URLs.
+- This file is not a frozen transitive SBOM. Before a binary or Store release,
+  regenerate a complete inventory from the exact resolved build environment.
+
+## Direct Python Runtime Dependencies
+
+| Package | Requirement | Checked environment version | License metadata | Source |
+|---|---|---:|---|---|
+| PySide6 | `PySide6>=6.5.0` | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6/ |
+| pyperclip | `pyperclip>=1.8.0` | 1.11.0 | BSD | https://pypi.org/project/pyperclip/ |
+| pandas | `pandas>=1.5.0` | 3.0.3 | BSD 3-Clause License | https://pypi.org/project/pandas/ |
+
+## Resolved Transitive Runtime Dependencies
+
+| Package | Required by | Checked environment version | License metadata | Source |
+|---|---|---:|---|---|
+| PySide6_Addons | PySide6 | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6-Addons/ |
+| PySide6_Essentials | PySide6 | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6-Essentials/ |
+| shiboken6 | PySide6 | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/shiboken6/ |
+| numpy | pandas | 2.4.6 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | https://pypi.org/project/numpy/ |
+| python-dateutil | pandas | 2.9.0.post0 | Apache-2.0 OR BSD-3-Clause | https://pypi.org/project/python-dateutil/ |
+| tzdata | pandas | 2026.2 | Apache-2.0 | https://pypi.org/project/tzdata/ |
+| six | python-dateutil | 1.17.0 | MIT | https://pypi.org/project/six/ |
+
+## Web Companion Runtime Dependencies
+
+| Package | Requirement | License metadata | Source |
+|---|---|---|---|
+| None | `web_companion/package.json` has no `dependencies` or `devDependencies`. | n/a | local package manifest |
+
+## Build Tooling
+
+| Package | Role | Checked metadata version | License metadata | Source |
+|---|---|---:|---|---|
+| PyInstaller | Optional executable build tool; not declared as a runtime dependency | 6.21.0 | GPL-2.0-or-later with a special exception for distributing non-free programs | https://pypi.org/project/pyinstaller/ |
+
+Release notes:
+
+- Preserve upstream license files and notices bundled inside installed wheels
+  and source distributions.
+- For LGPL Qt distribution, keep the Qt libraries replaceable and ship the
+  applicable license notices with binary releases.
+- Re-run this inventory whenever `requirements.txt`, `web_companion/package.json`
+  or the frozen build environment changes.

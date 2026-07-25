@@ -6,12 +6,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Added
-- Separate German `README_de.md` with installation, workflow, limitations and search context.
-- iOS/PWA installability assets: PNG app icons, Apple touch icon metadata, safe-area CSS and regression tests for install prompt, service worker offline fallback and query-insensitive cache hits.
+- Standardized `pyproject.toml` (PEP 621 metadata, pytest configuration with `pythonpath = "."`).
+- Visual Mermaid architecture & dataflow diagrams in `README.md` and `README_de.md` detailing clipboard event processing, regex/whitelist matching, and traffic-light decision workflow.
+- Visual status badges (Tests, PySide6, PWA Companion, LLM-Ready) and AI/LLM Callout boxes (`> [!NOTE]`).
 
 ### Changed
-- README now links to the German README and sharpens the search/disambiguation context for local clipboard privacy, clipboard anonymization and redaction workflows.
-- `llms.txt` updated for the 2026-06-13 visibility check with additional search phrases and external-discovery notes.
+- Updated `llms.txt` to `Last-checked: 2026-07-25` with 68 passing test suite verification notes (17 Python + 51 Web tests).
+- Enhanced discovery terms and keyword metadata across `pyproject.toml`, `README.md`, `README_de.md`, and `llms.txt`.
+
 - Web Companion metadata now includes English discovery terms for clipboard privacy, local-first anonymization and redaction.
 - `.gitignore` now excludes project locks, local env/credential files, local databases and automation planning folders before publication.
 

@@ -3,6 +3,7 @@ AmpelTool V6 - Datenschutz & Clipboard Monitor
 Neu: Eingebaute Regex-Patterns für IBAN, Email, Telefon, Kreditkarten
 """
 
+import os
 import sys
 import json
 import re
@@ -22,8 +23,6 @@ from PySide6.QtCore import Qt, QSize, QEvent
 from PySide6.QtGui import QAction, QIcon, QColor, QPixmap, QPainter, QBrush
 
 # --- Konfiguration ---
-CONFIG_PATH = Path(__file__).parent / "config.json"
-HISTORY_LIMIT = 15
 APP_NAME = "AmpelClip"
 APP_VERSION = "6"
 PROFILE_SCHEMA_VERSION = "ampelclip-profile-v1"
@@ -33,6 +32,22 @@ PATTERN_KEY_ALIASES = {
     "credit_card": "creditcard",
     "postal_code_de": "postcode_de",
 }
+
+
+def resolve_config_path() -> Path:
+    override = os.environ.get("AMPELCLIP_CONFIG_PATH")
+    if override:
+        return Path(override)
+    if getattr(sys, "frozen", False):
+        appdata = os.environ.get("LOCALAPPDATA")
+        if appdata:
+            return Path(appdata) / APP_NAME / "config.json"
+    return Path(__file__).parent / "config.json"
+
+
+CONFIG_PATH = resolve_config_path()
+CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+HISTORY_LIMIT = 15
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 
@@ -475,17 +490,58 @@ class AmpelTool(QMainWindow):
         btn_load_sens = QPushButton("Import Sensibel")
         btn_load_sens.setObjectName("Danger")
         btn_load_sens.clicked.connect(lambda: self._load_files("sensibel"))
+        self._set_accessible_context(
+            btn_load_sens,
+            name="Sensible Begriffe importieren",
+            description="Lädt eine Text- oder Excel-Datei mit sensiblen Begriffen.",
+            tooltip="Sensible Begriffe aus Datei importieren",
+        )
         
         btn_load_white = QPushButton("Import Whitelist")
         btn_load_white.setObjectName("Success")
         btn_load_white.clicked.connect(lambda: self._load_files("whitelist"))
+        self._set_accessible_context(
+            btn_load_white,
+            name="Whitelist-Begriffe importieren",
+            description="Lädt eine Text- oder Excel-Datei mit freigegebenen Whitelist-Begriffen.",
+            tooltip="Whitelist-Begriffe aus Datei importieren",
+        )
+        
+        btn_export_sens = QPushButton("Export Sensibel", clicked=lambda: self._export_list("sensibel"))
+        self._set_accessible_context(
+            btn_export_sens,
+            name="Sensible Begriffe exportieren",
+            description="Exportiert alle aktuellen sensiblen Begriffe in eine Textdatei.",
+            tooltip="Sensible Begriffe in Datei exportieren",
+        )
+        btn_export_white = QPushButton("Export Whitelist", clicked=lambda: self._export_list("whitelist"))
+        self._set_accessible_context(
+            btn_export_white,
+            name="Whitelist-Begriffe exportieren",
+            description="Exportiert alle aktuellen Whitelist-Begriffe in eine Textdatei.",
+            tooltip="Whitelist-Begriffe in Datei exportieren",
+        )
+        btn_export_prof = QPushButton("Profil exportieren", clicked=self._export_profile)
+        self._set_accessible_context(
+            btn_export_prof,
+            name="Profil exportieren",
+            description="Exportiert Einstellungen und Listen ohne Verlauf in ein JSON-Profil.",
+            tooltip="Einstellungen und Regellisten in JSON-Profil exportieren",
+        )
+        btn_import_prof = QPushButton("Profil importieren", clicked=self._import_profile)
+        self._set_accessible_context(
+            btn_import_prof,
+            name="Profil importieren",
+            description="Importiert Einstellungen und Listen aus einem JSON-Profil.",
+            tooltip="Einstellungen und Regellisten aus JSON-Profil importieren",
+        )
         
         files_layout.addWidget(btn_load_sens)
         files_layout.addWidget(btn_load_white)
-        files_layout.addWidget(QPushButton("Export Sensibel", clicked=lambda: self._export_list("sensibel")))
-        files_layout.addWidget(QPushButton("Export Whitelist", clicked=lambda: self._export_list("whitelist")))
-        files_layout.addWidget(QPushButton("Profil exportieren", clicked=self._export_profile))
-        files_layout.addWidget(QPushButton("Profil importieren", clicked=self._import_profile))
+        files_layout.addWidget(btn_export_sens)
+        files_layout.addWidget(btn_export_white)
+        files_layout.addWidget(btn_export_prof)
+        files_layout.addWidget(btn_import_prof)
         
         layout.addWidget(QLabel("Dateioperationen", objectName="Header"))
         layout.addWidget(frame_files)
@@ -553,9 +609,21 @@ class AmpelTool(QMainWindow):
         l_sens.addWidget(self.filter_sens)
         self.list_sens = QListWidget()
         self.list_sens.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
+        self._set_accessible_context(
+            self.list_sens,
+            name="Liste sensibler Begriffe",
+            description="Liste aller aktuell erfassten sensiblen Begriffe.",
+            tooltip="Sensible Begriffe",
+        )
         l_sens.addWidget(self.list_sens)
         btn_del_sens = QPushButton("Ausgewählte löschen")
         btn_del_sens.clicked.connect(lambda: self._delete_selected(self.list_sens, self.sensitive))
+        self._set_accessible_context(
+            btn_del_sens,
+            name="Sensible Begriffe löschen",
+            description="Löscht alle in der linken Liste ausgewählten Begriffe.",
+            tooltip="Ausgewählte sensible Begriffe löschen",
+        )
         l_sens.addWidget(btn_del_sens)
         
         w_white = QWidget()
@@ -573,9 +641,21 @@ class AmpelTool(QMainWindow):
         l_white.addWidget(self.filter_white)
         self.list_white = QListWidget()
         self.list_white.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
+        self._set_accessible_context(
+            self.list_white,
+            name="Whitelist-Begriffe",
+            description="Liste aller freigegebenen Whitelist-Begriffe.",
+            tooltip="Whitelist-Begriffe",
+        )
         l_white.addWidget(self.list_white)
         btn_del_white = QPushButton("Ausgewählte löschen")
         btn_del_white.clicked.connect(lambda: self._delete_selected(self.list_white, self.whitelist))
+        self._set_accessible_context(
+            btn_del_white,
+            name="Whitelist-Begriffe löschen",
+            description="Löscht alle in der rechten Liste ausgewählten Begriffe.",
+            tooltip="Ausgewählte Whitelist-Begriffe löschen",
+        )
         l_white.addWidget(btn_del_white)
 
         splitter.addWidget(w_sens)
@@ -600,6 +680,12 @@ class AmpelTool(QMainWindow):
             cb.setChecked(self.builtin_enabled.get(key, info["default"]))
             cb.stateChanged.connect(self._on_pattern_toggle)
             cb.setProperty("pattern_key", key)
+            self._set_accessible_context(
+                cb,
+                name=f"Pattern {info['name']}",
+                description=f"Aktiviert oder deaktiviert das Erkennungsmuster für {info['description']}.",
+                tooltip=info["description"],
+            )
             self.pattern_checkboxes[key] = cb
             group_layout.addWidget(cb)
         
@@ -646,7 +732,17 @@ class AmpelTool(QMainWindow):
         vis_layout = QHBoxLayout(vis_container)
         self.lbl_ampel_icon = QLabel()
         self.lbl_ampel_icon.setFixedSize(100, 100)
+        self._set_accessible_context(
+            self.lbl_ampel_icon,
+            name="Ampel-Farbindikator",
+            description="Visueller Indikator des aktuellen Ampel-Schutzstatus.",
+        )
         self.lbl_ampel_text = QLabel("ROT")
+        self._set_accessible_context(
+            self.lbl_ampel_text,
+            name="Ampelstatus Textanzeige",
+            description="Textuelle Anzeige des aktuellen Ampel-Schutzstatus.",
+        )
         vis_layout.addStretch()
         vis_layout.addWidget(self.lbl_ampel_icon)
         vis_layout.addWidget(self.lbl_ampel_text)
@@ -656,20 +752,50 @@ class AmpelTool(QMainWindow):
         ctrl_container = QHBoxLayout()
         btn_rot = QPushButton("STOP (Rot)", objectName="Danger", minimumHeight=40)
         btn_rot.clicked.connect(lambda: self._set_ampel("rot"))
+        self._set_accessible_context(
+            btn_rot,
+            name="Schutzmodus STOP (Rot)",
+            description="Aktiviert den STOP-Modus. Keine automatischen Ersetzungen in der Zwischenablage.",
+            tooltip="STOP-Modus aktivieren (Zwischenablage unverändert lassen)",
+        )
         btn_gelb = QPushButton("PREVIEW (Gelb)", objectName="Warning", minimumHeight=40)
         btn_gelb.clicked.connect(lambda: self._set_ampel("gelb"))
+        self._set_accessible_context(
+            btn_gelb,
+            name="Schutzmodus PREVIEW (Gelb)",
+            description="Aktiviert den Vorschau-Modus. Anonymisiert nur in der App-Vorschau.",
+            tooltip="PREVIEW-Modus aktivieren (Vorschau in App)",
+        )
         btn_gruen = QPushButton("ACTIVE (Grün)", objectName="Success", minimumHeight=40)
         btn_gruen.clicked.connect(lambda: self._set_ampel("gruen"))
+        self._set_accessible_context(
+            btn_gruen,
+            name="Schutzmodus ACTIVE (Grün)",
+            description="Aktiviert den Aktiv-Modus. Anonymisiert sensible Daten automatisch in der Zwischenablage.",
+            tooltip="ACTIVE-Modus aktivieren (Automatische Anonymisierung)",
+        )
         ctrl_container.addWidget(btn_rot)
         ctrl_container.addWidget(btn_gelb)
         ctrl_container.addWidget(btn_gruen)
         layout.addLayout(ctrl_container)
 
         opt_container = QHBoxLayout()
-        self.cb_case = QCheckBox("Gross-/Kleinschreibung beachten")
+        self.cb_case = QCheckBox("Groß-/Kleinschreibung beachten")
         self.cb_case.stateChanged.connect(self._on_option_change)
+        self._set_accessible_context(
+            self.cb_case,
+            name="Groß-/Kleinschreibung beachten",
+            description="Aktiviert die exakte Unterscheidung von Groß- und Kleinschreibung bei Suchmustern.",
+            tooltip="Groß-/Kleinschreibung bei Treffern beachten",
+        )
         self.cb_words = QCheckBox("Nur ganze Wörter")
         self.cb_words.stateChanged.connect(self._on_option_change)
+        self._set_accessible_context(
+            self.cb_words,
+            name="Nur ganze Wörter",
+            description="Beschränkt Suchmuster auf eigenständige ganze Wörter.",
+            tooltip="Suchmuster nur auf vollständige Wörter anwenden",
+        )
         opt_container.addWidget(self.cb_case)
         opt_container.addWidget(self.cb_words)
         opt_container.addStretch()
@@ -679,7 +805,19 @@ class AmpelTool(QMainWindow):
         layout.addWidget(QLabel("Vorschau (Live-Anonymisierung):", objectName="Header"))
         preview_split = QSplitter(Qt.Orientation.Horizontal)
         self.txt_original = QTextEdit(readOnly=True, placeholderText="Original...")
+        self._set_accessible_context(
+            self.txt_original,
+            name="Originaler Zwischenablagentext",
+            description="Zeigt den aus der Zwischenablage gelesenen Originaltext.",
+            tooltip="Originaltext der Zwischenablage",
+        )
         self.txt_anon = QTextEdit(readOnly=True, placeholderText="Ergebnis...")
+        self._set_accessible_context(
+            self.txt_anon,
+            name="Anonymisiertes Ergebnis",
+            description="Zeigt das Ergebnis nach Anwendung aller aktiven Muster und Whitelists.",
+            tooltip="Anonymisiertes Ergebnis",
+        )
         preview_split.addWidget(self.txt_original)
         preview_split.addWidget(self.txt_anon)
         layout.addWidget(preview_split, stretch=1)
@@ -693,13 +831,41 @@ class AmpelTool(QMainWindow):
         layout = QVBoxLayout(self.tab_history)
         self.list_history = QListWidget(alternatingRowColors=True)
         self.list_history.itemDoubleClicked.connect(self._restore_history)
+        self._set_accessible_context(
+            self.list_history,
+            name="Zwischenablagen-Verlauf",
+            description="Liste der zuletzt kopierten Zwischenablage-Einträge. Doppelklick stellt den Eintrag her.",
+            tooltip="Verlauf der Zwischenablage",
+        )
         layout.addWidget(self.list_history)
         
+        btn_restore = QPushButton("Wiederherstellen", clicked=self._restore_history)
+        self._set_accessible_context(
+            btn_restore,
+            name="Originaltext wiederherstellen",
+            description="Stellt den ausgewählten Verlaufseintrag im Original in der Zwischenablage wieder her.",
+            tooltip="Ausgewählten Eintrag original wiederherstellen",
+        )
+        btn_restore_anon = QPushButton("Anonymisierten Text kopieren", clicked=self._restore_history_anon)
+        self._set_accessible_context(
+            btn_restore_anon,
+            name="Anonymisierten Text kopieren",
+            description="Anonymisiert den ausgewählten Verlaufseintrag und kopiert ihn in die Zwischenablage.",
+            tooltip="Ausgewählten Eintrag anonymisiert kopieren",
+        )
+        btn_clear_history = QPushButton("Verlauf leeren", objectName="Danger", clicked=self._clear_history)
+        self._set_accessible_context(
+            btn_clear_history,
+            name="Verlauf leeren",
+            description="Löscht alle Einträge aus dem Verlauf der Zwischenablage.",
+            tooltip="Gesamten Verlauf leeren",
+        )
+
         btn_layout = QHBoxLayout()
-        btn_layout.addWidget(QPushButton("Wiederherstellen", clicked=self._restore_history))
-        btn_layout.addWidget(QPushButton("Anonymisiert Kopieren", clicked=self._restore_history_anon))
+        btn_layout.addWidget(btn_restore)
+        btn_layout.addWidget(btn_restore_anon)
         btn_layout.addStretch()
-        btn_layout.addWidget(QPushButton("Verlauf leeren", objectName="Danger", clicked=self._clear_history))
+        btn_layout.addWidget(btn_clear_history)
         layout.addLayout(btn_layout)
 
     # ---------------- CONFIG LOGIK ----------------
@@ -1002,15 +1168,19 @@ class AmpelTool(QMainWindow):
 
     # ---------------- CLIPBOARD LOGIK ----------------
     def _on_clipboard_change(self):
-        if not hasattr(self, 'clipboard'):
+        if not hasattr(self, 'clipboard') or self.clipboard is None:
             return
         if self.clipboard_lock:
             return
 
-        data = self.clipboard.mimeData()
-        if not data.hasText():
+        try:
+            data = self.clipboard.mimeData()
+            if not data or not data.hasText():
+                return
+            text = data.text()
+        except Exception as e:
+            logging.error(f"Clipboard Error: {e}")
             return
-        text = data.text()
 
         # Re-Entry-Guard: eigenen Clipboard-Write ignorieren (Windows queued
         # dataChanged — Signal trifft erst NACH setText() ein, wenn der bool-Lock

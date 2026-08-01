@@ -63,7 +63,8 @@ Alternativ kann die App mit `START.bat` gestartet werden.
 
 ## Konfiguration
 
-Die Einstellungen werden in `config.json` gespeichert. Die Datei entsteht beim ersten Start automatisch.
+Source-Starts speichern Einstellungen in der projektlokalen `config.json`, die beim ersten Start automatisch entsteht.
+Frozen Store-/EXE-Builds nutzen `%LOCALAPPDATA%\AmpelClip\config.json`.
 
 | Einstellung | Bedeutung |
 |---|---|
@@ -79,6 +80,24 @@ Die Einstellungen werden in `config.json` gespeichert. Die Datei entsteht beim e
 pip install pyinstaller
 pyinstaller --onefile --noconsole --icon=ICO.ico --name=AmpelClip Ampel6.py
 ```
+
+## Windows-Store-Readiness
+
+Store-Metadaten, Listingtext, Datenschutz-/Supportseiten und der konservative Preflight liegen in:
+
+- `store_package.json`
+- `STORE_LISTING.md`
+- `PRIVACY_POLICY.md`
+- `SUPPORT.md`
+- `releases/windowsstore/WINDOWS_STORE_PREP.md`
+
+Preflight ausführen:
+
+```bash
+python scripts/check_store_readiness.py --allow-blockers
+```
+
+Der Store-Pfad ist vorbereitet, bleibt aber durch externe Punkte blockiert: Partner-Center-Publisher-DN, frischer MSIX-Build und WACK-XML-Report.
 
 ## Suchkontext
 

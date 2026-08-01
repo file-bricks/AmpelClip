@@ -22,7 +22,7 @@ Scope:
 | Package | Requirement | Checked environment version | License metadata | Source |
 |---|---|---:|---|---|
 | PySide6 | `PySide6>=6.5.0` | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6/ |
-| pyperclip | `pyperclip>=1.8.0` | 1.11.0 | BSD | https://pypi.org/project/pyperclip/ |
+| openpyxl | `openpyxl>=3.0.0` | 3.1.5 | MIT | https://pypi.org/project/openpyxl/ |
 | pandas | `pandas>=1.5.0` | 3.0.3 | BSD 3-Clause License | https://pypi.org/project/pandas/ |
 
 ## Resolved Transitive Runtime Dependencies

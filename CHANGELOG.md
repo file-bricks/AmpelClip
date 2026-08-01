@@ -5,6 +5,43 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Geändert / Changed (2026-07-29)
+
+- **UX / Barrierefreiheit & deutsche Rechtschreibkorrektur:** 
+  Sämtliche UI-Elemente in `Ampel6.py` (Buttons, Eingabefelder, Listboxen, Vorschau- und Verlaufsanzeigen) wurden mit expliziten Accessibility-Kontexten (`AccessibleName`, `AccessibleDescription`, `ToolTip`) über `_set_accessible_context` ausgestattet. 
+  Textuelle End-User-Schreibweise korrigiert ("Gross-/Kleinschreibung" -> "Groß-/Kleinschreibung"). Barrierefreiheits-Tests in `tests/test_ui_accessibility.py` erweitert und verifiziert (24/24 passed).
+
+### Geändert / Changed (2026-07-26)
+
+- **Abhängigkeiten & Lizenzinventar bereinigt (TW-AC-02):** Unbenutztes `pyperclip`
+  aus `requirements.txt` und `THIRD_PARTY_LICENSES.txt` entfernt. `openpyxl>=3.0.0`
+  (v3.1.5) als direkte Laufzeit-/Test-Abhängigkeit für Excel-Dateitests ergänzt.
+  58/58 Pytest-Tests grün.
+
+### Hinzugefügt / Added (2026-07-03)
+
+- **macOS-/Linux-Source-Smoke dokumentiert:** Neues
+  `MACOS_LINUX_SOURCE_SMOKE.md` plus ausführbarer Smoke
+  `tests/source_platform_smoke.py` prüfen Source-Start, Tray-Laufzeitgate,
+  Qt-Clipboard-Vorschau und temporären Config-Pfad ohne Packaging-Claim.
+  `tests/test_source_platform_smoke_contract.py` hält Runbook und Smoke-Marker
+  synchron.
+- **Headless-Clipboard-Guard:** `_on_clipboard_change()` ignoriert jetzt auch
+  fehlende Qt-`mimeData()`-Objekte sauber, statt bei Offscreen-/Headless-Smokes
+  vor einem echten Clipboard-Text abzubrechen.
+
+### Hinzugefügt / Added (2026-07-01)
+
+- **Windows-Store-Readiness vorbereitet:** Store-Metadaten (`store_package.json`,
+  `releases/windowsstore/store_settings.json`), Store-Listing DE/EN,
+  Datenschutz-/Supporttexte und `releases/windowsstore/WINDOWS_STORE_PREP.md`
+  ergänzt. Neuer Preflight `scripts/check_store_readiness.py` trennt vorhandene
+  Store-Materialien von externen Gates (Partner Center, MSIX, WACK); Regressionen
+  in `tests/test_store_readiness.py` sichern den erwarteten Blocker-Status.
+- **Store-tauglicher Config-Pfad:** Frozen EXE-/Store-Builds schreiben Einstellungen
+  jetzt nach `%LOCALAPPDATA%\AmpelClip\config.json`; Source-Starts bleiben beim
+  projektlokalen `config.json`.
+
 ### Hinzugefügt / Added (2026-06-28)
 
 - **Ampel-Status-Toggle im Web Companion:** Der Ampel-Status (rot/gelb/grün) war bisher nur

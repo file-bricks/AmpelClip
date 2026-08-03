@@ -5,6 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Maintenance & Verification (2026-08-03)
+- Updated `llms.txt` `Last-checked` timestamp to `2026-08-03` with 100% passing test suite verification (17 Pytest + 51 Web companion tests).
+- Added Ecosystem (`file-bricks`) and Umbrella (`open-bricks`) Shields.io badges to `README.md` and `README_de.md`.
+- Verified PEP 621 metadata in `pyproject.toml` and clean execution of compileall and test suites.
+
 ### Added
 - Standardized `pyproject.toml` (PEP 621 metadata, pytest configuration with `pythonpath = "."`).
 - Visual Mermaid architecture & dataflow diagrams in `README.md` and `README_de.md` detailing clipboard event processing, regex/whitelist matching, and traffic-light decision workflow.

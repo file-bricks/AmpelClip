@@ -4,6 +4,8 @@
 
 [English](README.md) | **[Deutsch](README_de.md)**
 
+[![Ökosystem: file-bricks](https://img.shields.io/badge/Ökosystem-file--bricks-blue.svg)](https://github.com/file-bricks)
+[![Dachorganisation: open-bricks](https://img.shields.io/badge/Dachorganisation-open--bricks-purple.svg)](https://github.com/open-bricks)
 [![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-green.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Pytest](https://img.shields.io/badge/Tests-68%20bestanden-brightgreen.svg)]()

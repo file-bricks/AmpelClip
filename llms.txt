@@ -56,4 +56,4 @@ PySide6 clipboard privacy utility
 
 Current GitHub and web discovery is weak for broad clipboard-privacy searches. Exact `file-bricks AmpelClip` searches are the safest route. The repo should be pitched as a local-first clipboard redaction helper for manual privacy workflows, not as enterprise DLP or guaranteed anonymization.
 
-## Last-checked: 2026-07-25
+## Last-checked: 2026-08-03

@@ -84,13 +84,7 @@ class TranslationSystem:
             übersetzter Text oder Key als Fallback
         """
         if key in self.translations:
-            val = self.translations[key].get(self.current_lang)
-            if val and val.strip():
-                return val
-            fallback = self.translations[key].get("de")
-            if fallback and fallback.strip():
-                return fallback
-            return key
+            return self.translations[key].get(self.current_lang, key)
 
         if self._is_german(key):
             self.translations[key] = {"de": key, "en": ""}

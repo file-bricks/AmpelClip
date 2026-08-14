@@ -1,0 +1,37 @@
+{
+  "app_id": "AmpelClip",
+  "app_name": "AmpelClip",
+  "display_name": "AmpelClip",
+  "identity_name": "Geiger.AmpelClip",
+  "version": "6.0.0.0",
+  "publisher": "CN=52596601-BAB4-4F3F-B182-E8F3F273B202",
+  "publisher_display": "Lukas Geiger",
+  "executable": "AmpelClip.exe",
+  "category": "Productivity",
+  "age_rating": "3+",
+  "capabilities": "runFullTrust",
+  "languages": [
+    "de-DE",
+    "en-US"
+  ],
+  "privacy_url": "https://github.com/file-bricks/AmpelClip/blob/master/PRIVACY_POLICY.md",
+  "support_url": "https://github.com/file-bricks/AmpelClip/blob/master/SUPPORT.md",
+  "description": "Lokaler Windows-Zwischenablage-Wächter zum Erkennen und Anonymisieren sensibler kopierter Texte vor dem Einfügen.",
+  "local_data": {
+    "config": "%LOCALAPPDATA%\\AmpelClip\\config.json",
+    "source_config": "%APPDIR%\\config.json"
+  },
+  "forbidden_release_files": [
+    "config.json",
+    ".env",
+    ".env.*",
+    "credentials.json",
+    "client_secret*.json",
+    "token.json",
+    "*.db",
+    "*.sqlite",
+    "*.sqlite3",
+    "*.log"
+  ],
+  "store_status": "ready-for-msix-packaging"
+}

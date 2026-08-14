@@ -15,11 +15,21 @@ import sys
 TRANSLATION_FILE = "locales/translations.json"
 
 STRING_PATTERNS = [
+    # text = "..." / text = '...' — Zuweisungs-Syntax
     re.compile(r'text\s*=\s*"([^"]+)"'),
-    re.compile(r'setText\s*\(\s*["\']([^"\']+)["\']\s*\)'),
-    re.compile(r'setWindowTitle\s*\(\s*["\']([^"\']+)["\']\s*\)'),
-    re.compile(r'QLabel\s*\(\s*["\']([^"\']+)["\']\s*\)'),
-    re.compile(r'QPushButton\s*\(\s*["\']([^"\']+)["\']\s*\)'),
+    re.compile(r"text\s*=\s*'([^']+)'"),
+    # setText("...") / setText('...') — Apostroph-Fix: getrennte Varianten
+    re.compile(r'setText\s*\(\s*"([^"]+)"\s*\)'),
+    re.compile(r"setText\s*\(\s*'([^']+)'\s*\)"),
+    # setWindowTitle
+    re.compile(r'setWindowTitle\s*\(\s*"([^"]+)"\s*\)'),
+    re.compile(r"setWindowTitle\s*\(\s*'([^']+)'\s*\)"),
+    # QLabel
+    re.compile(r'QLabel\s*\(\s*"([^"]+)"\s*\)'),
+    re.compile(r"QLabel\s*\(\s*'([^']+)'\s*\)"),
+    # QPushButton
+    re.compile(r'QPushButton\s*\(\s*"([^"]+)"\s*\)'),
+    re.compile(r"QPushButton\s*\(\s*'([^']+)'\s*\)"),
 ]
 
 GERMAN_HINTS = [

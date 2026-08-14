@@ -1,0 +1,27 @@
+{
+  "app_name": "AmpelClip",
+  "publisher": "CN=52596601-BAB4-4F3F-B182-E8F3F273B202",
+  "publisher_display": "Lukas Geiger",
+  "identity_name": "Geiger.AmpelClip",
+  "version": "6.0.0.0",
+  "exe_name": "AmpelClip.exe",
+  "msix_name": "AmpelClip.msix",
+  "output_dir": "store_package",
+  "makeappx_path": "C:/Program Files (x86)/Windows Kits/10/App Certification Kit/makeappx.exe",
+  "signtool_path": "C:/Program Files (x86)/Windows Kits/10/App Certification Kit/signtool.exe",
+  "pfx_path": "",
+  "pfx_password": "",
+  "timestamp_url": "http://timestamp.digicert.com",
+  "license_files": [
+    "../../LICENSE"
+  ],
+  "enable_i18n": true,
+  "capabilities": "runFullTrust",
+  "privacy_url": "https://github.com/file-bricks/AmpelClip/blob/master/PRIVACY_POLICY.md",
+  "support_url": "https://github.com/file-bricks/AmpelClip/blob/master/SUPPORT.md",
+  "category": "Productivity",
+  "age_rating": "3+",
+  "description_de": "Lokaler Windows-Zwischenablage-Wächter zum Erkennen und Anonymisieren sensibler kopierter Texte vor dem Einfügen.",
+  "description_en": "Local-first Windows clipboard monitor for detecting and anonymizing sensitive copied text before pasting.",
+  "keywords": "Zwischenablage,Datenschutz,Anonymisierung,Redaction,PII,Textschutz,Clipboard"
+}

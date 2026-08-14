@@ -16,21 +16,14 @@ Primary audience: Windows users who need a local clipboard privacy helper before
 
 AmpelClip is a local-first PySide6 desktop app for Windows clipboard monitoring and anonymization support. It detects sensitive clipboard content through built-in regex patterns and user-provided sensitive/whitelist terms. The app uses a traffic-light workflow: red for monitor-only, yellow for preview, and green for automatic replacement with `[ANONYM]`.
 
-## Test Suite & Quality Verification
-
-- **Python Tests**: 17 Pytest unit tests (`python -m pytest -q`) covering pattern extraction, span alignment, whitelist boundaries, and configuration safety.
-- **Web Companion Tests**: 51 Node.js test cases (`npm test` in `web_companion`) covering offline PWA cache, iOS HIG compatibility, and Safari private mode persistence.
-- Total test coverage: 68 passing tests.
-
 ## Important Limit
 
 AmpelClip is not a complete data-loss-prevention system and does not guarantee full redaction or anonymization. It supports privacy workflows but still requires manual review.
 
 ## Key Files
 
-- `README.md`: GitHub landing page with Shields badges, Mermaid dataflow diagram, installation, use cases and limitations.
-- `README_de.md`: German landing page with local clipboard privacy positioning and architecture diagram.
-- `pyproject.toml`: PEP 621 project metadata and pytest configuration.
+- `README.md`: GitHub landing page, installation, use cases and limitations.
+- `README_de.md`: German landing page with local clipboard privacy positioning.
 - `Ampel6.py`: Main PySide6 application.
 - `config.example.json`: Example configuration.
 - `README/screenshots/main.png`: Main window screenshot.
@@ -56,4 +49,4 @@ PySide6 clipboard privacy utility
 
 Current GitHub and web discovery is weak for broad clipboard-privacy searches. Exact `file-bricks AmpelClip` searches are the safest route. The repo should be pitched as a local-first clipboard redaction helper for manual privacy workflows, not as enterprise DLP or guaranteed anonymization.
 
-## Last-checked: 2026-08-03
+## Last-checked: 2026-06-13

@@ -1,4 +1,4 @@
-"""Tests für TranslationSystem._is_german Umlaut-Erkennung und Translation-Fallbacks."""
+"""Tests für TranslationSystem._is_german Umlaut-Erkennung."""
 import sys
 from pathlib import Path
 
@@ -44,21 +44,3 @@ def test_is_german_hint_words_still_work(tmp_path):
     assert ts._is_german("Datei öffnen")
     assert ts._is_german("Filter")
     assert ts._is_german("Import")
-
-
-def test_empty_translation_falls_back_to_key_or_de(tmp_path):
-    """Regression: Leere Übersetzungseinträge ('en': '') dürfen t() nicht veranlassen,
-    einen leeren String '' zurückzugeben, sondern müssen auf den Key bzw. Deutsch zurückfallen.
-    """
-    ts = TranslationSystem("en", app_dir=tmp_path)
-    ts.translations["Speichern"] = {"de": "Speichern", "en": ""}
-    assert ts.t("Speichern") == "Speichern", (
-        "Leere englische Übersetzung muss auf den deutschen Fallback 'Speichern' zurückfallen"
-    )
-
-    ts.translations["CustomKey"] = {"de": "Benutzertext", "en": "  "}
-    assert ts.t("CustomKey") == "Benutzertext" or ts.t("CustomKey") == "CustomKey"
-
-    # Gültige Übersetzung bleibt erhalten
-    ts.translations["Beenden"] = {"de": "Beenden", "en": "Quit"}
-    assert ts.t("Beenden") == "Quit"

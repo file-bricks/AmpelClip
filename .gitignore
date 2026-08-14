@@ -1,4 +1,4 @@
-﻿# Backup / alte Versionen
+# Backup / alte Versionen
 _backup/
 
 # Python
@@ -60,3 +60,4 @@ docs/superpowers/
 # Development artifacts (backup and working copies)
 *.bak
 *_FINAL_*
+*-WORKSTATION-LG*

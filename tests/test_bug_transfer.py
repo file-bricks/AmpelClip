@@ -82,3 +82,61 @@ def test_u2_manage_translations_handles_oserror(tmp_path, monkeypatch):
         mt.manage_translations(str(tmp_path))
     except OSError as exc:
         pytest.fail(f"BUG-U2: manage_translations wirft unbehandelte OSError: {exc}")
+
+
+# ---------------------------------------------------------------------------
+# Bugsweep 2026-06-23 (Desktop, /bugsweep-Loop Run 4/15)
+# ---------------------------------------------------------------------------
+from Ampel6 import read_first_column_values, BUILTIN_PATTERNS  # noqa: E402
+
+_BS_SRC = (Path(__file__).parent.parent / "Ampel6.py").read_text(encoding="utf-8")
+
+
+def test_bs_txt_cp1252_fallback(tmp_path):
+    """read_first_column_values darf cp1252/Latin-1-Listen nicht still verwerfen
+    (vorher: read_text(utf-8) -> UnicodeDecodeError -> Liste lautlos leer)."""
+    p = tmp_path / "sens.txt"
+    p.write_bytes("Müller\nStraße\n".encode("cp1252"))
+    values = read_first_column_values(p)
+    assert "Müller" in values and "Straße" in values
+
+
+def test_bs_txt_strips_bom(tmp_path):
+    """UTF-8-BOM darf nicht am ersten Begriff kleben (utf-8-sig)."""
+    p = tmp_path / "bom.txt"
+    p.write_bytes(b"\xef\xbb\xbfBegriff\n")
+    values = read_first_column_values(p)
+    assert values and values[0] == "Begriff"
+
+
+def test_bs_xlsx_suffix_case_insensitive():
+    """.XLSX (Grossschreibung) muss als Excel erkannt werden, nicht als Text."""
+    assert 'path.suffix.lower() == ".xlsx"' in _BS_SRC
+
+
+def test_bs_email_regex_no_literal_pipe():
+    """E-Mail-TLD-Klasse darf kein literales '|' enthalten."""
+    assert "[A-Z|a-z]" not in _BS_SRC
+    assert BUILTIN_PATTERNS["email"]["regex"].endswith(r"[A-Za-z]{2,}\b")
+
+
+def test_bs_save_config_atomic():
+    """_save_config muss atomar schreiben (tmp + replace), nicht direkt aufs Ziel."""
+    assert "tmp.replace(CONFIG_PATH)" in _BS_SRC
+    assert 'open(CONFIG_PATH, "w"' not in _BS_SRC
+
+
+def test_bs_config_load_per_entry_guard():
+    """Ein fehlerhafter files-Eintrag darf nicht das ganze Config-Laden abbrechen."""
+    assert "isinstance(entry, (list, tuple)) and len(entry) == 2" in _BS_SRC
+
+
+def test_bs_ampel_status_validated_on_load():
+    """ampel_status aus der Config muss validiert werden (_normalized_ampel_status)."""
+    assert '_normalized_ampel_status(cfg.get("ampel_status"))' in _BS_SRC
+
+
+def test_bs_tray_availability_checked():
+    """_setup_tray muss isSystemTrayAvailable() pruefen und _tray_available setzen."""
+    assert "isSystemTrayAvailable()" in _BS_SRC
+    assert "_tray_available" in _BS_SRC

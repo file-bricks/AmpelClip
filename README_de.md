@@ -52,6 +52,22 @@ python Ampel6.py
 
 Alternativ kann die App mit `START.bat` gestartet werden.
 
+## Web-Companion
+
+[`web_companion/`](web_companion/) enthält einen implementierten lokalen PWA-Companion zum
+Bearbeiten von `ampelclip-profile-v1.json`-Profilen und zur manuellen Anonymisierung von
+Beispieltexten im Browser. Die Node-Tests prüfen Anonymisierungslogik, Profilverträge, Service
+Worker, Manifest, Installations-Hooks und Offline-Fallbacks:
+
+```bash
+cd web_companion
+npm test
+```
+
+Der Companion ist kein browserbasierter System-Clipboard-Monitor. Automatisierte Tests belegen
+weder Darstellung, Installation noch Offline-Verhalten auf einem realen Desktop- oder
+Mobilbrowser; diese Abnahmen stehen weiterhin aus.
+
 ## Ablauf
 
 1. Roten, gelben oder grünen Modus wählen.
@@ -97,7 +113,20 @@ Preflight ausführen:
 python scripts/check_store_readiness.py --allow-blockers
 ```
 
-Der Store-Pfad ist vorbereitet, bleibt aber durch externe Punkte blockiert: Partner-Center-Publisher-DN, frischer MSIX-Build und WACK-XML-Report.
+Aktueller lokaler Stand, geprüft am 2026-09-05:
+
+- Der Partner-Center-Publisher-DN ist in Store-Metadaten und Manifest gesetzt.
+- Im aktuellen Dirty Worktree liegen zwei bytegleiche MSIX-Kopien. Sie sind unversioniert,
+  unsigniert und nicht durch den Eigentümer freigegeben; ihre bloße Existenz ist kein Release-
+  oder Store-Readiness-Nachweis.
+- Der strikte Preflight endet mit Exitcode 2, weil ein WACK-XML-Report fehlt. Die derzeitige
+  MSIX-Prüfung belegt nur die Dateipräsenz; eine inhaltliche Paketvalidierung steht noch aus.
+- WACK-Abnahme, Signierung, Partner-Center-Einreichung, Store-Freigabe und Release sind nicht
+  nachgewiesen.
+
+Eigentümerentscheidung zum Dirty Slice, deterministische MSIX-Prüfung und externe
+WACK-/Einreichungsgates werden getrennt verfolgt. Ohne ausdrückliche Autorisierung darf kein
+Artefakt hochgeladen oder veröffentlicht werden.
 
 ## Suchkontext
 

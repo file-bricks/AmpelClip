@@ -14,7 +14,7 @@ Primary audience: Windows users who need a local clipboard privacy helper before
 
 ## Summary
 
-AmpelClip is a local-first PySide6 desktop app for Windows clipboard monitoring and anonymization support. It detects sensitive clipboard content through built-in regex patterns and user-provided sensitive/whitelist terms. The app uses a traffic-light workflow: red for monitor-only, yellow for preview, and green for automatic replacement with `[ANONYM]`.
+AmpelClip is a local-first PySide6 desktop app for Windows clipboard monitoring and anonymization support. It detects sensitive clipboard content through built-in regex patterns and user-provided sensitive/whitelist terms. The app uses a traffic-light workflow: red for monitor-only, yellow for preview, and green for automatic replacement with `[ANONYM]`. An implemented local PWA companion edits privacy-reduced profiles and manually anonymizes example text in a browser; it is not a system clipboard monitor.
 
 ## Important Limit
 
@@ -28,8 +28,18 @@ AmpelClip is not a complete data-loss-prevention system and does not guarantee f
 - `config.example.json`: Example configuration.
 - `README/screenshots/main.png`: Main window screenshot.
 - `web_companion/`: PWA companion for manual browser-based anonymization and profile exchange.
+- `web_companion/README.md`: Implemented scope, local run commands, evidence limits, and open browser/device gates.
 - `requirements.txt`: Python dependencies.
+- `scripts/check_store_readiness.py`: Conservative local Store preflight; strict mode remains non-zero while defined gates are open.
 - `LICENSE`: MIT license.
+
+## Current Verification and Release Boundaries
+
+- Run desktop tests with `python -m pytest -q` and PWA tests with `cd web_companion` followed by `npm test`.
+- The PWA engine and file contracts are automated; real desktop-browser, Android, and iOS acceptance is not yet evidenced.
+- The Partner Center publisher DN is configured. Two byte-identical MSIX files are currently present only as untracked, unsigned, owner-unapproved workspace artifacts.
+- The strict Store preflight exits 2 because WACK evidence is missing, and its current MSIX check establishes presence rather than substantive package validity.
+- No signing, WACK acceptance, Partner Center submission, Store approval, or release is claimed.
 
 ## Search Phrases
 
@@ -49,4 +59,4 @@ PySide6 clipboard privacy utility
 
 Current GitHub and web discovery is weak for broad clipboard-privacy searches. Exact `file-bricks AmpelClip` searches are the safest route. The repo should be pitched as a local-first clipboard redaction helper for manual privacy workflows, not as enterprise DLP or guaranteed anonymization.
 
-## Last-checked: 2026-06-13
+## Last-checked: 2026-09-05

@@ -30,7 +30,11 @@ Vielen Dank für Ihr Interesse, zu diesem Projekt beizutragen!
 ```bash
 git clone https://github.com/file-bricks/AmpelClip.git
 cd AmpelClip
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m pytest -q
+cd web_companion
+npm test
+cd ..
 python Ampel6.py
 ```
 
@@ -64,8 +68,12 @@ Thank you for your interest in contributing to this project!
 ### Getting Started
 
 ```bash
-git clone https://github.com/lukisch/AmpelClip.git
+git clone https://github.com/file-bricks/AmpelClip.git
 cd AmpelClip
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m pytest -q
+cd web_companion
+npm test
+cd ..
 python Ampel6.py
 ```

@@ -52,6 +52,22 @@ python Ampel6.py
 
 You can also start the app with `START.bat`.
 
+## Web Companion
+
+[`web_companion/`](web_companion/) contains an implemented local PWA companion for editing
+`ampelclip-profile-v1.json` profiles and manually anonymizing example text in a browser. Its Node
+tests cover the anonymization engine, profile contracts, service worker, manifest, install hooks,
+and offline fallbacks:
+
+```bash
+cd web_companion
+npm test
+```
+
+This is not a browser-based system clipboard monitor. Automated tests do not prove rendering,
+installation, or offline behavior on a real desktop or mobile browser; those acceptance smokes
+remain open.
+
 ## How It Works
 
 1. Choose red, yellow or green mode.
@@ -97,7 +113,17 @@ Run the preflight with:
 python scripts/check_store_readiness.py --allow-blockers
 ```
 
-The current Store gate is prepared but still blocked by external items: Partner Center publisher DN, a fresh MSIX build and a WACK XML report.
+Current local status, checked on 2026-09-05:
+
+- The Partner Center publisher DN is configured in the Store metadata and manifest.
+- Two byte-identical MSIX copies are present in the current dirty worktree, but they are untracked,
+  unsigned, and not owner-approved. Their presence is not a release or Store-readiness claim.
+- The strict preflight exits with code 2 because a WACK XML report is missing. Its current MSIX
+  check proves file presence only; substantive package validation is still open.
+- No WACK acceptance, signing, Partner Center submission, Store approval, or release is evidenced.
+
+The dirty-artifact decision, deterministic MSIX validation, and external WACK/submission gates are
+tracked separately. Do not upload or publish an artifact without explicit authorization.
 
 ## Search Context
 

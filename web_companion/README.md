@@ -1,23 +1,48 @@
 # AmpelClip Web-Companion
 
-Stand: 2026-05-26
+Stand: 2026-09-05
 
-Dieser Ordner ist ein Planungsplatzhalter für eine spätere Web/PWA-Linie. Der Companion soll nicht die Desktop-App ersetzen, sondern Profile bearbeiten und Beispieltexte manuell anonymisieren.
+Der Web-Companion ist als lokale Progressive Web App implementiert. Er ergänzt die Windows-App
+um manuelle Browser-Workflows und ersetzt nicht deren automatische Zwischenablage-Überwachung.
 
-## Geplanter Umfang
+## Implementierter Umfang
 
-- `ampelclip-profile-v1.json` importieren und exportieren
-- Sensibel-Liste, Whitelist und eingebaute Regex-Schalter bearbeiten
-- Beispieltext lokal im Browser anonymisieren
-- Ergebnis kopieren, ohne Texte an einen Server zu senden
-- PWA-Smoke für Android und iOS prüfen
+- `ampelclip-profile-v1.json` lokal importieren, normalisieren und wieder exportieren
+- Sensibel-Liste, Whitelist, eingebaute Regex-Schalter und Ampel-Modus bearbeiten
+- Beispieltexte lokal im Browser anonymisieren und das Ergebnis bewusst kopieren
+- Profilzustand lokal im Browser speichern; Fehler von `localStorage` werden abgefangen
+- Service Worker, Web-App-Manifest, Installationshinweis und PNG-/Maskable-/Apple-Touch-Icons
+- Offline-Fallback sowie abgesicherter Profil-Download für Chromium, Firefox und Safari
 
-## Grenzen
+Die Engine und die PWA-Dateiverträge werden automatisiert geprüft:
 
-- Kein dauerhafter System-Clipboard-Monitor im Browser
-- Keine Cloud-Synchronisation sensibler Regeln
-- Keine Speicherung von Clipboard-Historie
+```bash
+cd web_companion
+npm test
+```
 
-## Umsetzung offen
+Der Befehl benötigt keine npm-Pakete und führt die Node-Testdateien aus `tests/` aus. Er prüft
+Logik und Dateiverträge, aber kein sichtbares Browser-Rendering und keine Geräteinstallation.
 
-Die konkrete Implementierung beginnt erst, wenn der Desktop-Export stabil ist. Bis dahin bleibt dieser Ordner reine Planungsdokumentation.
+Für einen lokalen manuellen Browser-Smoke kann der Ordner über HTTP ausgeliefert werden:
+
+```bash
+cd web_companion
+python -m http.server 8080
+```
+
+Danach ist die Anwendung unter `http://127.0.0.1:8080/` erreichbar. Ein solcher manueller Lauf ist
+nur dann ein Nachweis, wenn Browser-/Geräteversion, geprüfte Schritte und Ergebnis protokolliert
+werden; der Serverstart allein ist keine Browser-Abnahme.
+
+## Grenzen und offene Gates
+
+- Kein dauerhafter oder systemweiter Clipboard-Monitor im Browser oder auf Mobilgeräten
+- Keine Cloud-Synchronisation sensibler Regeln und kein Upload von Beispieltexten
+- Keine Übernahme oder Speicherung der Desktop-Clipboard-Historie im Profilformat
+- Reale Chromium-/Firefox-/Safari-, Android- und iOS-Abnahmen stehen als TASKPLAN #31 aus
+- Die derzeit uncommitteten PWA-Icon-/Manifeständerungen sind ein fremder Dirty Slice und bleiben
+  bis zur Eigentümerentscheidung in TASKPLAN #28 unbestätigt
+
+Der aktuelle `npm test`-Lauf ist grün. Daraus folgt weder eine veröffentlichte Web-App noch eine
+bestätigte Offline-Installation auf einem realen Browser oder Mobilgerät.

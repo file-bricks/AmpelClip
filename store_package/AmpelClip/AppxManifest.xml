@@ -1,45 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Package
-  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10">
-  <Identity
-    Name="Geiger.AmpelClip"
-    Publisher="CN=52596601-BAB4-4F3F-B182-E8F3F273B202"
-    Version="6.0.0.0"
-    ProcessorArchitecture="x64" />
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
+
+  <Identity Name="Geiger.AmpelClip"
+            Publisher="CN=52596601-BAB4-4F3F-B182-E8F3F273B202"
+            Version="6.0.0.0" />
+
   <Properties>
     <DisplayName>AmpelClip</DisplayName>
     <PublisherDisplayName>Lukas Geiger</PublisherDisplayName>
-    <Logo>assets\Square50x50Logo.png</Logo>
-    <Description>Lokaler Windows-Zwischenablage-Wächter für sensible Texte vor dem Einfügen.</Description>
+    <Description>Lokaler Windows-Zwischenablage-Wächter zum Erkennen und Anonymisieren sensibler kopierter Texte vor dem Einfügen.</Description>
+    <Logo>icons\icon_50x50.png</Logo>
   </Properties>
-  <Resources>
-    <Resource Language="de-DE" />
-    <Resource Language="en-US" />
-  </Resources>
+
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
   </Dependencies>
+
+  <Resources>
+    <Resource Language="de-DE"/>
+    <Resource Language="en-US"/>
+  </Resources>
+
   <Capabilities>
-    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="runFullTrust"/>
+
   </Capabilities>
+
   <Applications>
-    <Application
-      Id="AmpelClip"
-      Executable="AmpelClip.exe"
-      EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements
-        DisplayName="AmpelClip"
-        Description="Lokaler Windows-Zwischenablage-Wächter für sensible Texte vor dem Einfügen."
-        BackgroundColor="transparent"
-        Square150x150Logo="assets\Square150x150Logo.png"
-        Square44x44Logo="assets\Square44x44Logo.png">
-        <uap:DefaultTile
-          Square71x71Logo="assets\Square44x44Logo.png"
-          Square310x310Logo="assets\Square310x310Logo.png"
-          Wide310x150Logo="assets\Wide310x150Logo.png" />
+    <Application Id="AmpelClipApp"
+                 Executable="AmpelClip.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="AmpelClip"
+                          Description="Lokaler Windows-Zwischenablage-Wächter zum Erkennen und Anonymisieren sensibler kopierter Texte vor dem Einfügen."
+                          Square150x150Logo="icons\icon_150x150.png"
+                          Square44x44Logo="icons\icon_44x44.png"
+                          BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="icons\icon_310x150.png" />
       </uap:VisualElements>
     </Application>
   </Applications>

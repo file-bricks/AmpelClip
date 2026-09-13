@@ -61,3 +61,8 @@ docs/superpowers/
 *.bak
 *_FINAL_*
 *-WORKSTATION-LG*
+
+# Store-/Release-Binaerartefakte (je ~80 MB, gehoeren nicht ins Repo)
+*.msix
+*.msixbundle
+*.appx

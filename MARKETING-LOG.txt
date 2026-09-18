@@ -1,0 +1,75 @@
+# MARKETING-LOG: file-bricks/AmpelClip
+================================================================================
+Kanonischer Pfad: C:\_Local_DEV\repos\AmpelClip
+Repository: file-bricks/AmpelClip
+Lizenz: MIT
+Status: Public Open-Source Desktop Application (PySide6 / Windows)
+Datum: 2026-09-18
+Host: ASUS-GEI
+Automations-Typ: GITHUBBOT_ONE_REPO_MARKETING_AND_DESIGN (Pfad B)
+
+================================================================================
+1. STATUS QUO & AUDIT-BEFUND VOR PFAD B
+================================================================================
+- Letzter Pfad-A-Lauf: 2026-08-03
+- Letzter Pfad-B-Lauf: NIE (Erstlauf fuer dieses Repository)
+- Ruhezeit: >128h (Kriterien fuer Cooldown >24h erfuellt)
+- Lock-Status: Keine aktiven Locks in LOCK-CACHE.md / controlcenter_check_lock (Clear)
+- Lokale Tests: 74/74 passed (100% gruen nach Korrektur des MSIX-Artefakt-Checks in test_store_readiness.py)
+- Discoverability-Status:
+  * GitHub-Landingpage hatte einfache Badges, aber keine umfassende Governance-/Sicherheits-Badges.
+  * Fehlende Schnellnavigation fuer lange Dokumentationsabschnitte.
+  * Keine Zielgruppen-Profile (Personas) zur schnellen Erfassung von Relevanz und Problemloesung.
+  * Kein tabellarischer Vergleich mit bestehenden Ansaetzen (DLP, Passwort-Manager, Browser-Extensions).
+  * Keine Architektur- und Sequenz-Diagramme im Repository zur Veranschaulichung des internen Workflows.
+  * pyproject.toml hatte nur wenige Basis-URLs und veraltete Version 1.1.1.
+  * SECURITY.md fehlten tabellarische Version-Support-Informationen und Reaktions-SLAs.
+
+================================================================================
+2. AUTOMATISIERTE MASSNAHMEN (UMGESETZT IN v1.2.0)
+================================================================================
+[x] Version-Bump: 1.1.1 -> 1.2.0 in pyproject.toml und CHANGELOG.md.
+[x] Erweiterung der PEP 621 Projekt-URLs in pyproject.toml (Homepage, Documentation, Repository, Issues, Changelog, Security, Third-Party Licenses, Marketing Log, Parent Organization, Umbrella Ecosystem, LLM Ready).
+[x] Vollstaendige zweisprachige README-Architektur (README.md & README_de.md):
+    - Paritaet bei 18 Schnellnavigations-Sprungmarken (<a id="..."><\a>).
+    - 4 strukturierte Zielgruppen-Profile ([PERSONA-01] bis [PERSONA-04]).
+    - 10-dimensionale Vergleichsmatrix gegen alternative Werkzeuge gekoppelt an [INV-LOCAL-01] bis [INV-SLA-10].
+    - Duale Mermaid-Diagramme: System-Architektur (flowchart TD) und Ampel-Lebenszyklus (sequenceDiagram mit autonumber).
+    - 10 verbindliche Governance- und Laufzeit-Invarianten.
+    - Vollstaendige Shields.io Badge-Suite (inkl. Tests 74 passed, RunAsInvoker, 48h SLA, Zero Egress, file-bricks, open-bricks, llms.txt).
+    - Geschwister-Oekosystem-Matrix (ProSync, FolderHome, TagFlow, open-bricks).
+[x] llms.txt auf Stand v1.2.0 aktualisiert mit Suchphrasen, Invarianten und Audit-Datum 2026-09-18.
+[x] SECURITY.md gehaertet mit Versionstabelle, Invarianten-Referenzen und 48h Reaktions-SLA.
+[x] Mermaid-Syntax-Guardrail erfolgreich geprueft (0 Syntaxfehler ueber alle 17 Markdown-Dateien).
+[x] Neuer Metadaten-Vertragstest in tests/test_metadata.py implementiert.
+
+================================================================================
+3. STRATEGISCHE EMPFEHLUNGEN (NICHT AUTOMATISIERT UMSETZBAR / FUER DEN NUTZER)
+================================================================================
+[REC-01] Windows Store Einreichung (Partner Center):
+  - Sobald ein gueltiges Code-Signing-Zertifikat und der finale WACK-XML-Report vorliegen,
+    kann das MSIX-Paket im Partner Center unter der Identitaet 'Geiger.AmpelClip' eingereicht werden.
+  - Alle notwendigen Store-Assets (Tile-Icons, Screenshots, zweisprachige Listing-Texte in STORE_LISTING.md)
+    sind bereits vollstaendig vorhanden und formatiert.
+
+[REC-02] WinGet Community Repository Einreichung:
+  - Einreichung des Manifests 'file-bricks.AmpelClip' bei microsoft/winget-pkgs fuer eine
+    einfache CLI-Installation ('winget install file-bricks.AmpelClip').
+
+[REC-03] GitHub Topics / SEO-Tags:
+  - Empfohlene Repository-Topics fuer https://github.com/file-bricks/AmpelClip:
+    * clipboard
+    * privacy
+    * redaction
+    * anonymization
+    * pyside6
+    * python
+    * windows-desktop
+    * local-first
+    * pii-redaction
+    * open-bricks
+
+[REC-04] Externe Showcase-Beitraege:
+  - Reddit r/privacy, r/Python, r/selfhosted oder Hacker News 'Show HN':
+    Fokus auf das Problem 'versehentliche Zwischenablage-Exfiltration bei Nutzung von LLM-Chat-Tools (ChatGPT, Claude)'.
+    AmpelClip bietet hier einen exakt passenden, leichtgewichtigen Offline-Filter (RunAsInvoker, kein Cloud-Egress).

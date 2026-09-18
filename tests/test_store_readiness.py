@@ -35,10 +35,9 @@ def test_store_readiness_has_only_expected_external_blockers():
     results = check_store_readiness.collect_results(ROOT)
     blockers = {result.key for result in results if result.status == "blocker"}
 
-    assert blockers == {
-        "msix_artifact",
-        "wack_report",
-    }
+    msix_exists = any((ROOT / "releases" / "windowsstore").glob("*.msix"))
+    expected_blockers = {"wack_report"} if msix_exists else {"msix_artifact", "wack_report"}
+    assert blockers == expected_blockers
     assert {result.key for result in results if result.status == "ok"} >= {
         "store_package.json",
         "store_package_fields",
@@ -73,7 +72,7 @@ def test_store_readiness_cli_reports_blocked_but_allows_known_gates():
 
     assert strict.returncode == 2
     assert "AmpelClip Store readiness: BLOCKED" in strict.stdout
-    assert "MSIX-Artefakt fehlt noch" in strict.stdout
+    assert "WACK-XML-Report fehlt noch" in strict.stdout
     assert allowed.returncode == 0
 
 

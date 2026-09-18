@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ampelclip"
-version = "1.1.1"
+version = "1.2.0"
 description = "Local-first Windows clipboard privacy monitor with traffic-light preview and anonymization support"
 readme = "README.md"
 authors = [
@@ -46,6 +46,13 @@ Homepage = "https://github.com/file-bricks/AmpelClip#readme"
 Documentation = "https://github.com/file-bricks/AmpelClip/blob/master/llms.txt"
 Repository = "https://github.com/file-bricks/AmpelClip.git"
 Issues = "https://github.com/file-bricks/AmpelClip/issues"
+Changelog = "https://github.com/file-bricks/AmpelClip/blob/master/CHANGELOG.md"
+Security = "https://github.com/file-bricks/AmpelClip/blob/master/SECURITY.md"
+"Third-Party Licenses" = "https://github.com/file-bricks/AmpelClip/blob/master/THIRD_PARTY_LICENSES.txt"
+"Marketing Log" = "https://github.com/file-bricks/AmpelClip/blob/master/MARKETING-LOG.txt"
+"Parent Organization" = "https://github.com/file-bricks"
+"Umbrella Ecosystem" = "https://github.com/open-bricks"
+"LLM Ready" = "https://github.com/file-bricks/AmpelClip/blob/master/llms.txt"
 
 [tool.pytest.ini_options]
 minversion = "7.0"

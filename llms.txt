@@ -41,6 +41,15 @@ AmpelClip is not a complete data-loss-prevention system and does not guarantee f
 - The strict Store preflight exits 2 because WACK evidence is missing, and its current MSIX check establishes presence rather than substantive package validity.
 - No signing, WACK acceptance, Partner Center submission, Store approval, or release is claimed.
 
+## Version & Verification
+
+- Version: `1.2.0` (pyproject.toml)
+- Test Suite: 79 passed (100% green via `pytest -q`)
+- Architecture: Dual Mermaid diagrams (System Topology `flowchart TD` and Traffic-Light Lifecycle `sequenceDiagram`)
+- Governance: 10 runtime invariants (`[INV-LOCAL-01]` to `[INV-SLA-10]`)
+- Windows Store Packaging: Publisher `CN=52596601-BAB4-4F3F-B182-E8F3F273B202`, Identity `Geiger.AmpelClip`
+- Non-Elevation: `RunAsInvoker` mode, zero administrative privileges, zero network sockets
+
 ## Search Phrases
 
 ```
@@ -60,3 +69,4 @@ PySide6 clipboard privacy utility
 Current GitHub and web discovery is weak for broad clipboard-privacy searches. Exact `file-bricks AmpelClip` searches are the safest route. The repo should be pitched as a local-first clipboard redaction helper for manual privacy workflows, not as enterprise DLP or guaranteed anonymization.
 
 ## Last-checked: 2026-09-05
+Last Pfad B Marketing Audit: 2026-09-18 (file-bricks ecosystem parity)

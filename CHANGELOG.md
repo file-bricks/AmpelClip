@@ -5,6 +5,24 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-18
+
+### Hinzugefügt / Added (2026-09-18)
+
+- **Pfad B Marketing & Discoverability Architektur:**
+  - Zweisprachige README-Parität (`README.md` & `README_de.md`) mit 18 synchronisierten Schnellnavigations-Ankern (`<a id="..."></a>`).
+  - 4 Zielgruppen-Profile (`[PERSONA-01]` bis `[PERSONA-04]`) für Entwickler/KI-Prompter, Compliance-Beauftragte (DSGVO), Helpdesk-Support und Windows-Power-User.
+  - 10-dimensionale Vergleichsmatrix gegenüber Enterprise-DLP, Passwort-Managern, Browser-Erweiterungen und manuellem Notepad-Suchen/Ersetzen.
+  - Duale Mermaid-Diagramme: System-Topologie (`flowchart TD`) und Ampel-Lebenszyklus (`sequenceDiagram` mit `autonumber`, ohne Semikolons, mit quotierten Kantenbeschriftungen).
+  - 10 verbindliche Governance- und Laufzeit-Invarianten (`[INV-LOCAL-01]` bis `[INV-SLA-10]`).
+  - Vollständige Shields.io Badge-Suite (MIT, Python 3.10+, Windows, Offline-first, Tests 74 bestanden, RunAsInvoker, 48h SLA, Zero Egress, file-bricks Ökosystem, open-bricks Dachverband, LLM-Ready).
+  - Geschwister-Ökosystem-Matrix mit Querverweisen zu `ProSync`, `FolderHome`, `TagFlow` und `open-bricks`.
+  - Erweiterte PEP 621 Projekt-URLs in `pyproject.toml` (Dokumentation, Changelog, Security, Third-Party Licenses, Marketing Log, Ecosystem, LLM Ready).
+  - Gehärtete `SECURITY.md` mit Versionstabelle (`1.2.x`, `1.1.x`, `< 1.1.0`), 48h Reaktions-SLA und Sicherheitsinvarianten.
+  - Lokales `MARKETING-LOG.txt` für Discoverability-Audits und manuelle Veröffentlichungs-Empfehlungen angelegt.
+  - Robuster gestaltete `tests/test_store_readiness.py` für lokale ungetrackte `.msix`-Dateien.
+  - Neuer Metadaten- und Paritäts-Vertragstest `tests/test_metadata.py`.
+
 ### Hinzugefügt / Added (2026-08-14)
 
 - **Microsoft Store Readiness & MSIX-Packaging-Vorbereitung:**

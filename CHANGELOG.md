@@ -5,6 +5,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed (2026-09-19)
+
+- **Datenschutz / Regex-Pattern (`phone_de`):**
+  - Führendes `\b` in `BUILTIN_PATTERNS["phone_de"]["regex"]` durch negativen Lookbehind `(?<!\w)` ersetzt.
+  - Behebt ein Datenschutz-Problem (PII-Leak), durch das deutsche Telefonnummern im internationalen `+49`-Format (z. B. `+49 170 1234567`) wegen des Nicht-Wort-Zeichens `+` nach Leerzeichen oder Satzzeichen nicht erkannt und somit unmaskiert blieben.
+  - Verhindert gleichzeitig Falsch-Positive bei alphanumerischen Wort-Präfixen wie `abc+49...`.
+  - Neuer Regressionstest in `tests/test_builtin_phone_regex.py` (5 Tests) verifiziert Erkennung und Parität.
+
 ## [1.2.0] - 2026-09-18
 
 ### Hinzugefügt / Added (2026-09-18)

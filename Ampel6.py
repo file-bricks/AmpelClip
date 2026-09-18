@@ -67,7 +67,7 @@ BUILTIN_PATTERNS = {
     },
     "phone_de": {
         "name": "Telefonnummern (DE)",
-        "regex": r"\b(?:\+49|0049|0)[\s.-]?(?:\d{2,4})[\s.-]?(?:\d{3,})[\s.-]?(?:\d{2,})\b",
+        "regex": r"(?<!\w)(?:\+49|0049|0)[\s.-]?(?:\d{2,4})[\s.-]?(?:\d{3,})[\s.-]?(?:\d{2,})\b",
         "description": "+49 170 1234567, 0170-1234567",
         "default": False
     },

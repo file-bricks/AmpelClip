@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import xml.etree.ElementTree as ET
+import zipfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from PIL import Image
@@ -174,8 +176,10 @@ def _check_tile_assets(root: Path) -> list[CheckResult]:
                 bad_dim.append(f"{rel}: {e}")
     if missing or bad_dim:
         errs = []
-        if missing: errs.append("Fehlend: " + ", ".join(missing))
-        if bad_dim: errs.append("Falsche Dimension: " + ", ".join(bad_dim))
+        if missing:
+            errs.append("Fehlend: " + ", ".join(missing))
+        if bad_dim:
+            errs.append("Falsche Dimension: " + ", ".join(bad_dim))
         return [CheckResult("store_tile_assets", "blocker", "; ".join(errs))]
     return [CheckResult("store_tile_assets", "ok", "Alle Microsoft Store Tile-Icons vorhanden und maßhaltig")]
 
@@ -291,22 +295,232 @@ def _check_secret_guardrails(root: Path) -> list[CheckResult]:
     return [CheckResult("secret_ignores", "ok", "Config-, Lock-, Secret- und Datenartefakte sind ausgeschlossen")]
 
 
-def _check_msix_and_wack(root: Path) -> list[CheckResult]:
-    msix = list((root / "releases" / "windowsstore").glob("*.msix"))
-    wack = list((root / "releases" / "windowsstore").glob("wack_*.xml"))
-    results = []
-    if msix:
-        results.append(CheckResult("msix_artifact", "ok", "MSIX-Artefakt gefunden"))
-    else:
-        results.append(CheckResult("msix_artifact", "blocker", "MSIX-Artefakt fehlt noch"))
-    if wack:
-        results.append(CheckResult("wack_report", "ok", "WACK-XML-Report gefunden"))
-    else:
-        results.append(CheckResult("wack_report", "blocker", "WACK-XML-Report fehlt noch"))
+def _validate_msix_archive(msix_path: Path, store_package: dict) -> list[CheckResult]:
+    results: list[CheckResult] = []
+    if not msix_path.is_file():
+        return [CheckResult("msix_content", "blocker", f"MSIX {msix_path.name} ist keine reguläre Datei")]
+
+    if msix_path.stat().st_size < 500:
+        return [CheckResult("msix_content", "blocker", f"MSIX {msix_path.name} ist zu klein (< 500 Bytes)")]
+
+    try:
+        with zipfile.ZipFile(msix_path, "r") as zf:
+            names = set(zf.namelist())
+
+            # 1. Package structure
+            required_files = ["AppxManifest.xml", "AppxBlockMap.xml", "[Content_Types].xml"]
+            missing_files = [f for f in required_files if f not in names]
+            if missing_files:
+                results.append(
+                    CheckResult(
+                        "msix_content",
+                        "blocker",
+                        f"Pflichtdateien fehlen im MSIX {msix_path.name}: {', '.join(missing_files)}",
+                    )
+                )
+                return results
+
+            # 2. Executable presence
+            expected_exe = store_package.get("executable") or "AmpelClip.exe"
+            if expected_exe not in names:
+                results.append(
+                    CheckResult(
+                        "msix_content",
+                        "blocker",
+                        f"Haupt-Executable '{expected_exe}' fehlt im MSIX {msix_path.name}",
+                    )
+                )
+
+            # 3. Internal AppxManifest.xml validation
+            manifest_raw = zf.read("AppxManifest.xml").decode("utf-8")
+            try:
+                root = ET.fromstring(manifest_raw)
+                identity = None
+                for elem in root.iter():
+                    if elem.tag.endswith("Identity"):
+                        identity = elem
+                        break
+
+                if identity is None:
+                    results.append(
+                        CheckResult("msix_content", "blocker", f"Kein <Identity> Tag in AppxManifest des MSIX {msix_path.name}")
+                    )
+                else:
+                    expected_id = store_package.get("identity_name") or EXPECTED_IDENTITY
+                    expected_pub = store_package.get("publisher") or EXPECTED_PUBLISHER
+                    expected_ver = store_package.get("version") or "6.0.0.0"
+
+                    if identity.get("Name") != expected_id:
+                        results.append(
+                            CheckResult(
+                                "msix_content",
+                                "blocker",
+                                f"MSIX Identity Name Mismatch: '{identity.get('Name')}' != '{expected_id}'",
+                            )
+                        )
+                    if identity.get("Publisher") != expected_pub:
+                        results.append(
+                            CheckResult(
+                                "msix_content",
+                                "blocker",
+                                f"MSIX Publisher Mismatch: '{identity.get('Publisher')}' != '{expected_pub}'",
+                            )
+                        )
+                    if identity.get("Version") != expected_ver:
+                        results.append(
+                            CheckResult(
+                                "msix_content",
+                                "blocker",
+                                f"MSIX Version Mismatch: '{identity.get('Version')}' != '{expected_ver}'",
+                            )
+                        )
+
+                # Capabilities
+                capabilities = [
+                    elem.attrib.get("Name")
+                    for elem in root.iter()
+                    if elem.tag.endswith("Capability")
+                ]
+                if "runFullTrust" not in capabilities:
+                    results.append(
+                        CheckResult(
+                            "msix_content",
+                            "blocker",
+                            f"runFullTrust Capability fehlt in AppxManifest des MSIX {msix_path.name}",
+                        )
+                    )
+
+                # Application Executable
+                app_elem = None
+                for elem in root.iter():
+                    if elem.tag.endswith("Application"):
+                        app_elem = elem
+                        break
+                if app_elem is not None and app_elem.get("Executable") != expected_exe:
+                    results.append(
+                        CheckResult(
+                            "msix_content",
+                            "blocker",
+                            f"MSIX Application Executable Mismatch: '{app_elem.get('Executable')}' != '{expected_exe}'",
+                        )
+                    )
+
+            except ET.ParseError as exc:
+                results.append(
+                    CheckResult("msix_content", "blocker", f"AppxManifest im MSIX {msix_path.name} ist kein valides XML: {exc}")
+                )
+
+            # 4. Asset checks
+            tile_assets = ["assets/Square44x44Logo.png", "assets/Square150x150Logo.png", "assets/Square50x50Logo.png"]
+            missing_assets = [a for a in tile_assets if a not in names and f"icons/{Path(a).name}" not in names]
+            if missing_assets:
+                results.append(
+                    CheckResult(
+                        "msix_content",
+                        "warn",
+                        f"Optionale Store-Kachelicons fehlen im MSIX {msix_path.name}: {', '.join(missing_assets)}",
+                    )
+                )
+
+    except (zipfile.BadZipFile, OSError) as exc:
+        return [CheckResult("msix_content", "blocker", f"MSIX {msix_path.name} ist kein lesbares ZIP: {exc}")]
+
+    # 5. SHA256 checksum verification
+    sha_file = msix_path.parent / "SHA256SUMS.txt"
+    if sha_file.exists():
+        try:
+            expected_hash = None
+            for line in sha_file.read_text(encoding="utf-8").splitlines():
+                if msix_path.name in line:
+                    expected_hash = line.split()[0].strip().lower()
+                    break
+            if expected_hash:
+                actual_hash = hashlib.sha256(msix_path.read_bytes()).hexdigest().lower()
+                if actual_hash != expected_hash:
+                    results.append(
+                        CheckResult(
+                            "msix_content",
+                            "blocker",
+                            f"SHA256 Mismatch für {msix_path.name}: erwartet {expected_hash}, berechnet {actual_hash}",
+                        )
+                    )
+                else:
+                    results.append(
+                        CheckResult("msix_checksum", "ok", f"SHA256-Prüfsumme für {msix_path.name} erfolgreich validiert")
+                    )
+        except OSError as exc:
+            results.append(
+                CheckResult("msix_checksum", "warn", f"Konnte SHA256SUMS.txt nicht lesen: {exc}")
+            )
+
+    if not any(r.status == "blocker" for r in results):
+        results.append(
+            CheckResult(
+                "msix_content",
+                "ok",
+                f"MSIX-Paketinhalt ({msix_path.name}) ist valide, integer und manifestkonform",
+            )
+        )
+
     return results
 
 
-def collect_results(root: Path = PROJECT_ROOT) -> list[CheckResult]:
+def _check_msix_and_wack(
+    root: Path,
+    store_package: dict,
+    msix_path: Path | None = None,
+    skip_msix: bool = False,
+    require_msix: bool = True,
+    wack_path: Path | None = None,
+) -> list[CheckResult]:
+    results: list[CheckResult] = []
+
+    # MSIX check
+    if skip_msix:
+        results.append(CheckResult("msix_artifact", "warn", "MSIX-Prüfung per Option übersprungen"))
+    elif msix_path is not None:
+        if not msix_path.exists():
+            results.append(CheckResult("msix_artifact", "blocker", f"MSIX-Datei '{msix_path}' existiert nicht"))
+        else:
+            results.append(CheckResult("msix_artifact", "ok", f"MSIX-Artefakt gefunden: {msix_path.name}"))
+            results.extend(_validate_msix_archive(msix_path, store_package))
+    else:
+        target_msix = list((root / "releases" / "windowsstore").glob("*.msix"))
+        if target_msix:
+            for p in target_msix:
+                results.append(CheckResult("msix_artifact", "ok", f"MSIX-Artefakt gefunden: {p.name}"))
+                results.extend(_validate_msix_archive(p, store_package))
+        else:
+            if require_msix:
+                results.append(CheckResult("msix_artifact", "blocker", "MSIX-Artefakt fehlt noch"))
+            else:
+                results.append(CheckResult("msix_artifact", "warn", "MSIX-Artefakt fehlt (Prüfung optional übersprungen)"))
+
+    # WACK report check
+    if wack_path is not None:
+        target_wack = [wack_path]
+    else:
+        target_wack = list((root / "releases" / "windowsstore").glob("wack_*.xml"))
+
+    if target_wack:
+        for w in target_wack:
+            if not w.exists():
+                results.append(CheckResult("wack_report", "blocker", f"WACK-Report '{w}' existiert nicht"))
+            else:
+                results.append(CheckResult("wack_report", "ok", f"WACK-XML-Report gefunden: {w.name}"))
+    else:
+        results.append(CheckResult("wack_report", "blocker", "WACK-XML-Report fehlt noch"))
+
+    return results
+
+
+def collect_results(
+    root: Path = PROJECT_ROOT,
+    msix_path: Path | None = None,
+    skip_msix: bool = False,
+    require_msix: bool = True,
+    wack_path: Path | None = None,
+) -> list[CheckResult]:
     store_package, results = _check_store_package(root)
     results.extend(_check_store_settings(root, store_package))
     results.extend(_check_appx_manifest(root))
@@ -316,7 +530,16 @@ def collect_results(root: Path = PROJECT_ROOT) -> list[CheckResult]:
     results.extend(_check_materials(root))
     results.extend(_check_desktop_config_path(root))
     results.extend(_check_secret_guardrails(root))
-    results.extend(_check_msix_and_wack(root))
+    results.extend(
+        _check_msix_and_wack(
+            root,
+            store_package,
+            msix_path=msix_path,
+            skip_msix=skip_msix,
+            require_msix=require_msix,
+            wack_path=wack_path,
+        )
+    )
     return results
 
 
@@ -338,9 +561,30 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Return 0 even while external Partner Center/MSIX/WACK gates remain open",
     )
+    parser.add_argument(
+        "--msix",
+        type=Path,
+        default=None,
+        help="Path to specific MSIX package to validate",
+    )
+    parser.add_argument(
+        "--skip-msix",
+        action="store_true",
+        help="Do not treat a missing MSIX as a blocker and skip package inspection",
+    )
+    parser.add_argument(
+        "--wack",
+        type=Path,
+        default=None,
+        help="Path to specific WACK XML report",
+    )
     args = parser.parse_args(argv)
 
-    results = collect_results()
+    results = collect_results(
+        msix_path=args.msix,
+        skip_msix=args.skip_msix,
+        wack_path=args.wack,
+    )
     has_blocker = any(result.status == "blocker" for result in results)
 
     if args.json:

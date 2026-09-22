@@ -1,10 +1,11 @@
 # AmpelClip Windows Store Preparation
 
-Stand: 2026-09-05
+Stand: 2026-09-22
 
 ## Status: Materialien vorbereitet, Veröffentlichung blockiert
 
-Der lokale Preflight bestätigt die vorhandenen Metadaten und Materialien. Er ist jedoch kein
+Der lokale Preflight bestätigt die vorhandenen Metadaten und Materialien. Er validiert das
+MSIX-Paket tiefgreifend auf Format, Manifest, Executable, BlockMap und Kacheln. Er ist jedoch kein
 Release-, Signatur-, WACK- oder Store-Akzeptanznachweis:
 
 - Partner-Center Publisher-DN `CN=52596601-BAB4-4F3F-B182-E8F3F273B202` (Lukas Geiger) und Identität `Geiger.AmpelClip` gesetzt.
@@ -14,6 +15,7 @@ Release-, Signatur-, WACK- oder Store-Akzeptanznachweis:
 - 4 offizielle Store-Screenshots in nativer 1920x1080 Full-HD-Auflösung in `screenshots/store/` hinterlegt.
 - `STORE_LISTING.md` zweisprachig (DE/EN) mit exakt 7 Suchbegriffen (Policy 10.1.3 konform, keine geschützten Drittmarken) aktualisiert.
 - `PRIVACY_POLICY.md`, `SUPPORT.md`, `LICENSE`, `SECURITY.md`, `THIRD_PARTY_LICENSES.txt` vorhanden und validiert.
+- MSIX-Paketinhalt wird durch `scripts/check_store_readiness.py` deterministisch auf ZIP-Integrität, Manifest-Übereinstimmung, `AmpelClip.exe`, Pflichtdateien, Kachel-Assets und optionale SHA256-Prüfsummen tiefenvalidiert (Task #29 erledigt).
 
 Im aktuellen Dirty Worktree liegen zwei bytegleiche, unversionierte MSIX-Kopien mit demselben
 SHA-256-Wert. Sie enthalten ein lesbares Paket, aber keine `AppxSignature.p7x`; der lokale
@@ -29,16 +31,14 @@ nicht entschieden. Die Dateien sind daher keine bestätigten Release-Kandidaten.
 - `screenshots/store/` mit 4 hochauflösenden Store-Screenshots (1920x1080).
 - `STORE_LISTING.md` mit optimierten Texten für das Microsoft Partner Center.
 - `PRIVACY_POLICY.md` und `SUPPORT.md` mit Store-tauglichen Nutzertexten.
-- `scripts/check_store_readiness.py` als konservativer lokaler Preflight.
-- `tests/test_store_materials.py` und `tests/test_store_readiness.py` als automatisierte Verträge.
+- `scripts/check_store_readiness.py` als konservativer lokaler Preflight mit tiefer MSIX-Prüfung (`--msix`, `--skip-msix`).
+- `tests/test_store_materials.py` und `tests/test_store_readiness.py` als automatisierte Verträge (12 Store-Readiness-Tests).
 
 ## Offene externe Gates
 
-- Eigentum und Verwendung des vorhandenen Dirty-MSIX-Slice ausdrücklich freigeben oder ablehnen.
-- MSIX-Inhalt, Manifest, Version, Assets, Hash und Signaturstatus deterministisch validieren; die
-  aktuelle Preflight-Prüfung bestätigt nur die Dateipräsenz.
-- WACK-XML-Report `releases/windowsstore/wack_YYYYMMDD_HHMMSS.xml` via Windows App Certification Kit generieren.
-- Einreichung im Microsoft Partner Center nur nach ausdrücklicher Autorisierung.
+- Eigentum und Verwendung des vorhandenen Dirty-MSIX-Slice ausdrücklich freigeben oder ablehnen (#28).
+- WACK-XML-Report `releases/windowsstore/wack_YYYYMMDD_HHMMSS.xml` via Windows App Certification Kit generieren (#30).
+- Einreichung im Microsoft Partner Center nur nach ausdrücklicher Autorisierung (#30).
 
 ## Preflight-Ausführung
 

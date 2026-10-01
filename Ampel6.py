@@ -8,6 +8,9 @@ import sys
 import json
 import re
 import logging
+import stat
+import tempfile
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, List, Tuple, Dict
@@ -28,6 +31,7 @@ APP_VERSION = "6"
 PROFILE_SCHEMA_VERSION = "ampelclip-profile-v1"
 PROFILE_DEFAULT_FILENAME = f"{PROFILE_SCHEMA_VERSION}.json"
 VALID_AMPEL_STATUSES = {"rot", "gelb", "gruen"}
+_SAVE_PUBLICATION_LOCK = threading.Lock()
 PATTERN_KEY_ALIASES = {
     "credit_card": "creditcard",
     "postal_code_de": "postcode_de",
@@ -273,10 +277,46 @@ def normalize_profile_payload(payload: Any) -> Dict[str, Any]:
     }
 
 
+def _write_text_atomic(path: Path, text: str) -> None:
+    """Publish complete text; preserve existing files when writing fails."""
+    tmp = None
+    identity = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent,
+            prefix=".ampelclip-", suffix=".tmp", delete=False,
+        ) as stream:
+            tmp = Path(stream.name)
+            identity = os.fstat(stream.fileno())
+            stream.write(text)
+        current = tmp.lstat()
+        if not stat.S_ISREG(current.st_mode) or not os.path.samestat(current, identity):
+            raise OSError("Die temporäre Speicherdatei wurde extern verändert.")
+        # Concurrent Windows replacements can fail with WinError 5 even when
+        # both staging handles are closed. Serialize publication in this process.
+        with _SAVE_PUBLICATION_LOCK:
+            tmp.replace(path)
+        tmp = None
+    finally:
+        if tmp is not None and identity is not None:
+            try:
+                current = tmp.lstat()
+                if stat.S_ISREG(current.st_mode) and os.path.samestat(current, identity):
+                    tmp.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError as error:
+                try:
+                    logging.warning("Eigene temporäre Datei konnte nicht entfernt werden: %s", error)
+                except Exception:
+                    # A failing custom log handler must not hide the save error.
+                    pass
+
+
 def write_profile_payload(path: Path, payload: Dict[str, Any]) -> None:
-    path.write_text(
+    _write_text_atomic(
+        path,
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
     )
 
 
@@ -919,13 +959,7 @@ class AmpelTool(QMainWindow):
             "builtin_patterns": self.builtin_enabled  # NEU
         }
         try:
-            # Atomar schreiben (tmp + replace): _save_config laeuft bei jedem Toggle/
-            # Add/Delete/Ampelwechsel -> ein Crash waehrend json.dump wuerde sonst eine
-            # leere/halbe config.json hinterlassen (Verlust aller Listen/Patterns).
-            tmp = CONFIG_PATH.with_suffix(".tmp")
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(cfg, f, indent=2)
-            tmp.replace(CONFIG_PATH)
+            _write_text_atomic(CONFIG_PATH, json.dumps(cfg, ensure_ascii=False, indent=2))
         except Exception as e:
             logging.error(f"Config Save Error: {e}")
 
@@ -1018,7 +1052,7 @@ class AmpelTool(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(self, "Export", "", "Text (*.txt)")
         if path:
             try: 
-                Path(path).write_text("\n".join(data), encoding="utf-8")
+                _write_text_atomic(Path(path), "\n".join(data))
             except Exception as e: 
                 QMessageBox.critical(self, "Fehler", str(e))
 

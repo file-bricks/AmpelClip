@@ -58,8 +58,9 @@ def test_german_documents_use_real_umlauts_without_mojibake():
         _read(path)
         for path in (
             "README_de.md",
-            "PORTIERUNGSPLAN.md",
-            "AUFGABEN.txt",
+            # Pipeline planning files live in OneDrive and are gitignored.
+            # Source checks validate the documents delivered by the repository.
+            "SAVE_SAFETY.md",
             "releases/windowsstore/WINDOWS_STORE_PREP.md",
             "web_companion/README.md",
         )

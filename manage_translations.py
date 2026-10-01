@@ -79,7 +79,7 @@ def manage_translations(source_dir="."):
         try:
             with open(trans_file, "r", encoding="utf-8") as f:
                 translations = json.load(f)
-        except (json.JSONDecodeError, OSError) as error:
+        except (json.JSONDecodeError, OSError, UnicodeError) as error:
             logging.error("Übersetzungskatalog konnte nicht gelesen werden; Datei bleibt erhalten: %s", error)
             return False
     else:
@@ -102,7 +102,7 @@ def manage_translations(source_dir="."):
     try:
         os.makedirs(os.path.dirname(trans_file), exist_ok=True)
         write_text_atomic(Path(trans_file), json.dumps(translations, indent=2, ensure_ascii=False))
-    except OSError as error:
+    except (OSError, UnicodeError) as error:
         logging.error("Übersetzungskatalog konnte nicht gespeichert werden: %s", error)
         return False
 

@@ -70,3 +70,12 @@ def test_cli_success_reports_zero_and_writes_valid_catalog(tmp_path):
                              capture_output=True, text=True, encoding='utf-8')
     assert process.returncode == 0
     assert json.loads(path.read_text(encoding='utf-8'))['Bestehender Text']['en'] == 'Existing text'
+
+
+@pytest.mark.parametrize('content', [b'\xff\xfe\x80', b'{"Text":{"en":"\\ud800"}}'])
+def test_catalog_encoding_errors_return_false_without_changing_bytes(tmp_path, content):
+    path = catalog(tmp_path)
+    path.write_bytes(content)
+    assert scanner.manage_translations(str(tmp_path)) is False
+    assert path.read_bytes() == content
+    assert list(path.parent.iterdir()) == [path]

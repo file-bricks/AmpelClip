@@ -56,7 +56,8 @@ def test_u2_manage_translations_handles_json_decode_error(tmp_path):
 
     # Muss ohne Exception durchlaufen — korrupte Datei → leeres Dict
     try:
-        mt.manage_translations(str(tmp_path))
+        assert mt.manage_translations(str(tmp_path)) is False
+        assert corrupt_json.read_text(encoding="utf-8") == "{nicht: valides json"
     except (json.JSONDecodeError, OSError) as exc:
         pytest.fail(f"BUG-U2: manage_translations wirft unbehandelte Exception: {exc}")
 
@@ -72,16 +73,17 @@ def test_u2_manage_translations_handles_oserror(tmp_path, monkeypatch):
     original_open = open
 
     def patched_open(path, *args, **kwargs):
-        if str(path) == str(trans_file):
+        if isinstance(path, (str, Path)) and Path(path) == trans_file:
             raise OSError("simulierter Lesefehler")
         return original_open(path, *args, **kwargs)
 
     monkeypatch.setattr("builtins.open", patched_open)
 
     try:
-        mt.manage_translations(str(tmp_path))
+        assert mt.manage_translations(str(tmp_path)) is False
     except OSError as exc:
         pytest.fail(f"BUG-U2: manage_translations wirft unbehandelte OSError: {exc}")
+    assert trans_file.read_bytes() == b"{}"
 
 
 # ---------------------------------------------------------------------------
@@ -120,10 +122,23 @@ def test_bs_email_regex_no_literal_pipe():
     assert BUILTIN_PATTERNS["email"]["regex"].endswith(r"[A-Za-z]{2,}\b")
 
 
-def test_bs_save_config_atomic():
-    """_save_config muss atomar schreiben (tmp + replace), nicht direkt aufs Ziel."""
-    assert "tmp.replace(CONFIG_PATH)" in _BS_SRC
-    assert 'open(CONFIG_PATH, "w"' not in _BS_SRC
+def test_bs_save_config_atomic(tmp_path, monkeypatch):
+    """The previous file stays intact until complete JSON is published."""
+    from types import SimpleNamespace
+    import Ampel6
+    path = tmp_path / "config.json"
+    path.write_bytes(b"PREVIOUS")
+    monkeypatch.setattr(Ampel6, "CONFIG_PATH", path)
+    real_replace = Path.replace
+    def publish(stage, destination):
+        assert path.read_bytes() == b"PREVIOUS"
+        assert json.loads(stage.read_text(encoding="utf-8"))["ampel_status"] == "rot"
+        return real_replace(stage, destination)
+    monkeypatch.setattr(Path, "replace", publish)
+    state = SimpleNamespace(file_history=[], ampel_status="rot", case_sensitive=False,
+                            whole_words=False, builtin_enabled={})
+    Ampel6.AmpelTool._save_config(state)
+    assert json.loads(path.read_text(encoding="utf-8"))["ampel_status"] == "rot"
 
 
 def test_bs_config_load_per_entry_guard():

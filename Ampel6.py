@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, List, Tuple, Dict
 
+from file_storage import write_text_atomic as _write_text_atomic
+
 import pandas as pd
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -273,10 +275,12 @@ def normalize_profile_payload(payload: Any) -> Dict[str, Any]:
     }
 
 
+
+
 def write_profile_payload(path: Path, payload: Dict[str, Any]) -> None:
-    path.write_text(
+    _write_text_atomic(
+        path,
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
     )
 
 
@@ -919,13 +923,7 @@ class AmpelTool(QMainWindow):
             "builtin_patterns": self.builtin_enabled  # NEU
         }
         try:
-            # Atomar schreiben (tmp + replace): _save_config laeuft bei jedem Toggle/
-            # Add/Delete/Ampelwechsel -> ein Crash waehrend json.dump wuerde sonst eine
-            # leere/halbe config.json hinterlassen (Verlust aller Listen/Patterns).
-            tmp = CONFIG_PATH.with_suffix(".tmp")
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(cfg, f, indent=2)
-            tmp.replace(CONFIG_PATH)
+            _write_text_atomic(CONFIG_PATH, json.dumps(cfg, ensure_ascii=False, indent=2))
         except Exception as e:
             logging.error(f"Config Save Error: {e}")
 
@@ -1018,7 +1016,7 @@ class AmpelTool(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(self, "Export", "", "Text (*.txt)")
         if path:
             try: 
-                Path(path).write_text("\n".join(data), encoding="utf-8")
+                _write_text_atomic(Path(path), "\n".join(data))
             except Exception as e: 
                 QMessageBox.critical(self, "Fehler", str(e))
 

@@ -53,10 +53,15 @@ def test_store_readiness_has_only_expected_external_blockers():
         "store_tile_assets",
         "store_screenshots",
         "store_docs",
-        "runtime_materials",
         "desktop_config_path",
         "secret_ignores",
     }
+    runtime = next(result for result in results if result.key == "runtime_materials")
+    exe_exists = any(path.exists() for path in (
+        ROOT / "AmpelClip.exe", ROOT / "dist" / "AmpelClip.exe",
+        ROOT / "releases" / "v6.0.0" / "AmpelTool_V6.exe",
+    ))
+    assert runtime.status == ("ok" if exe_exists else "warn")
     if msix_exists:
         assert "msix_content" in ok_keys
 

@@ -11,6 +11,10 @@ import json
 import re
 import os
 import sys
+import logging
+from pathlib import Path
+
+from file_storage import write_text_atomic
 
 TRANSLATION_FILE = "locales/translations.json"
 
@@ -75,10 +79,17 @@ def manage_translations(source_dir="."):
         try:
             with open(trans_file, "r", encoding="utf-8") as f:
                 translations = json.load(f)
-        except (json.JSONDecodeError, OSError):
-            translations = {}
+        except (json.JSONDecodeError, OSError, UnicodeError) as error:
+            logging.error("Übersetzungskatalog konnte nicht gelesen werden; Datei bleibt erhalten: %s", error)
+            return False
     else:
         translations = {}
+
+    if not isinstance(translations, dict) or any(
+        not isinstance(entry, dict) for entry in translations.values()
+    ):
+        logging.error("Ungültiger Übersetzungskatalog; Datei bleibt erhalten.")
+        return False
 
     found = find_german_strings(source_dir)
 
@@ -88,12 +99,15 @@ def manage_translations(source_dir="."):
             translations[s] = {"de": s, "en": ""}
             added.append(s)
 
-    os.makedirs(os.path.dirname(trans_file), exist_ok=True)
-    with open(trans_file, "w", encoding="utf-8") as f:
-        json.dump(translations, f, indent=2, ensure_ascii=False)
+    try:
+        os.makedirs(os.path.dirname(trans_file), exist_ok=True)
+        write_text_atomic(Path(trans_file), json.dumps(translations, indent=2, ensure_ascii=False))
+    except (OSError, UnicodeError) as error:
+        logging.error("Übersetzungskatalog konnte nicht gespeichert werden: %s", error)
+        return False
 
     if added:
-        print(f"[+] {len(added)} neue Eintraege hinzugefuegt:")
+        print(f"[+] {len(added)} neue Einträge hinzugefügt:")
         for s in added[:20]:
             print(f"    - {s}")
         if len(added) > 20:
@@ -105,11 +119,12 @@ def manage_translations(source_dir="."):
     if missing:
         print(f"\n[!] {len(missing)} fehlende englische Übersetzungen")
     else:
-        print("\n[ok] Alle Strings haben englische übersetzungen.")
+        print("\n[ok] Alle Strings haben englische Übersetzungen.")
 
     print(f"\n[i] Gesamt: {len(translations)} Strings in {trans_file}")
+    return True
 
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else "."
-    manage_translations(target)
+    raise SystemExit(0 if manage_translations(target) else 1)

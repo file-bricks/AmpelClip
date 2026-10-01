@@ -1,11 +1,16 @@
 # Sichere Speicherung in AmpelClip
 
-Konfiguration, JSON-Profile und exportierte Textlisten werden zuerst in eine
+Konfiguration, JSON-Profile, Übersetzungskataloge und exportierte Textlisten werden zuerst in eine
 exklusiv angelegte temporäre Datei im Zielordner geschrieben. Erst nach dem
 vollständigen Schreiben und Schließen ersetzt diese Datei das gewählte Ziel.
 Bei Serialisierungs-, Schreib- oder Veröffentlichungsfehlern bleibt die bisherige
 Zieldatei erhalten. Die Fehlermeldung beim Profil-/Listenexport bleibt sichtbar;
 Konfigurationsfehler werden weiterhin protokolliert.
+
+Ein nicht lesbarer oder ungültiger Übersetzungskatalog wird nicht durch einen
+leeren Katalog ersetzt. Der Übersetzungsscanner meldet den Fehler und liefert
+`False`; beim CLI-Aufruf lautet der Exitcode `1`. Erfolgreiche Läufe liefern
+`True` beziehungsweise Exitcode `0`.
 
 Parallele Konfigurations-Saves verwenden unterschiedliche temporäre Dateien;
 die Veröffentlichung wird innerhalb desselben Prozesses nacheinander ausgeführt.

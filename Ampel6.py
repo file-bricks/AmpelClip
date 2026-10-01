@@ -8,12 +8,11 @@ import sys
 import json
 import re
 import logging
-import stat
-import tempfile
-import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, List, Tuple, Dict
+
+from file_storage import write_text_atomic as _write_text_atomic
 
 import pandas as pd
 from PySide6.QtWidgets import (
@@ -31,7 +30,6 @@ APP_VERSION = "6"
 PROFILE_SCHEMA_VERSION = "ampelclip-profile-v1"
 PROFILE_DEFAULT_FILENAME = f"{PROFILE_SCHEMA_VERSION}.json"
 VALID_AMPEL_STATUSES = {"rot", "gelb", "gruen"}
-_SAVE_PUBLICATION_LOCK = threading.Lock()
 PATTERN_KEY_ALIASES = {
     "credit_card": "creditcard",
     "postal_code_de": "postcode_de",
@@ -277,40 +275,6 @@ def normalize_profile_payload(payload: Any) -> Dict[str, Any]:
     }
 
 
-def _write_text_atomic(path: Path, text: str) -> None:
-    """Publish complete text; preserve existing files when writing fails."""
-    tmp = None
-    identity = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            mode="w", encoding="utf-8", dir=path.parent,
-            prefix=".ampelclip-", suffix=".tmp", delete=False,
-        ) as stream:
-            tmp = Path(stream.name)
-            identity = os.fstat(stream.fileno())
-            stream.write(text)
-        current = tmp.lstat()
-        if not stat.S_ISREG(current.st_mode) or not os.path.samestat(current, identity):
-            raise OSError("Die temporäre Speicherdatei wurde extern verändert.")
-        # Concurrent Windows replacements can fail with WinError 5 even when
-        # both staging handles are closed. Serialize publication in this process.
-        with _SAVE_PUBLICATION_LOCK:
-            tmp.replace(path)
-        tmp = None
-    finally:
-        if tmp is not None and identity is not None:
-            try:
-                current = tmp.lstat()
-                if stat.S_ISREG(current.st_mode) and os.path.samestat(current, identity):
-                    tmp.unlink()
-            except FileNotFoundError:
-                pass
-            except OSError as error:
-                try:
-                    logging.warning("Eigene temporäre Datei konnte nicht entfernt werden: %s", error)
-                except Exception:
-                    # A failing custom log handler must not hide the save error.
-                    pass
 
 
 def write_profile_payload(path: Path, payload: Dict[str, Any]) -> None:

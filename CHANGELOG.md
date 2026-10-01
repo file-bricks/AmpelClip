@@ -16,6 +16,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   EXE-Artefakte mehr. Fehlende Release-/WACK-Nachweise bleiben im Store-Preflight
   sichtbar. CI prüft Python 3.10/3.12 auf Windows, Linux und macOS sowie Web-Verträge.
 - Verhalten und Grenzen der Speicherung stehen in `SAVE_SAFETY.md`.
+- Übersetzungskataloge bleiben bei Lese-/Schreibfehlern erhalten; der Scanner
+  meldet Fehler auch per CLI-Exitcode. Die neue Plattformprüfung deckte einen
+  zuvor unter Windows wirkungslosen Pfadvergleich im Lesefehler-Test auf.
 
 ### Behoben / Fixed (2026-09-19)
 

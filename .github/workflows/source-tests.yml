@@ -27,7 +27,6 @@ jobs:
     env:
       QT_QPA_PLATFORM: offscreen
       PYTHONIOENCODING: utf-8
-      AMPELCLIP_CONFIG_PATH: ${{ runner.temp }}/ampelclip-tests/config.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -44,6 +43,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt pytest Pillow
       - name: Run complete source suite
+        env:
+          AMPELCLIP_CONFIG_PATH: ${{ runner.temp }}/ampelclip-tests/config.json
         run: python -m pytest -o addopts= -ra -q
       - name: Run source platform smoke
         run: python tests/source_platform_smoke.py

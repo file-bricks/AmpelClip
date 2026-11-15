@@ -4,7 +4,7 @@
   "description": "AmpelClip Web Companion — local-first clipboard privacy and text anonymization PWA",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/library.test.mjs tests/pwa.test.mjs"
+    "test": "node --test tests/library.test.mjs tests/pwa.test.mjs tests/sw_asset_hash.test.mjs"
   },
   "keywords": ["clipboard-privacy", "anonymization", "redaction", "local-first", "pwa", "datenschutz", "zwischenablage"],
   "license": "MIT"
